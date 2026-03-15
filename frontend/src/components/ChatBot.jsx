@@ -1,8 +1,24 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { MessageCircle, Send, X, Minimize2, Maximize2 } from 'lucide-react'
 import api from '../api/client'
 
+// SERVICE ROUTING MAP
+const SERVICE_ROUTES = {
+  plumbing: { path: '/services?category=plumbing', label: 'Plumbers', icon: '🔧', categoryId: 1 },
+  electrical: { path: '/services?category=electrical', label: 'Electricians', icon: '⚡', categoryId: 3 },
+  cleaning: { path: '/services?category=cleaning', label: 'Cleaners', icon: '🧹', categoryId: 2 },
+  beauty: { path: '/services?category=beauty', label: 'Beauty & Wellness', icon: '💆', categoryId: 4 },
+  carpentry: { path: '/services?category=carpentry', label: 'Carpenters', icon: '🪚', categoryId: 5 },
+  painting: { path: '/services?category=painting', label: 'Painters', icon: '🎨', categoryId: 6 },
+  ac_repair: { path: '/services?category=ac_repair', label: 'AC & Appliances', icon: '❄️', categoryId: 7 },
+  tutoring: { path: '/services?category=tutoring', label: 'Tutors', icon: '📚', categoryId: 8 },
+  pest_control: { path: '/services?category=pest_control', label: 'Pest Control', icon: '🐛', categoryId: 9 },
+  cooking: { path: '/services?category=cooking', label: 'Cooks', icon: '👨‍🍳', categoryId: 10 },
+}
+
 export default function ChatBot() {
+  const navigate = useNavigate()
   const [isOpen, setIsOpen] = useState(false)
   const [isMinimized, setIsMinimized] = useState(false)
   const [messages, setMessages] = useState([
@@ -63,10 +79,13 @@ export default function ChatBot() {
         language: 'nepali'
       })
 
+      const { reply, route_to } = response.data?.data || {}
+
       const botMessage = {
         id: messages.length + 2,
-        text: response.data.data.response,
+        text: reply || 'Let me help you!',
         sender: 'bot',
+        route: route_to,
         timestamp: new Date()
       }
       setMessages(prev => [...prev, botMessage])
@@ -123,25 +142,40 @@ export default function ChatBot() {
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
             {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
+              <div key={msg.id}>
                 <div
-                  className={`max-w-xs px-4 py-2 rounded-lg ${
-                    msg.sender === 'user'
-                      ? 'bg-primary-600 text-white rounded-br-none'
-                      : 'bg-white text-gray-800 border border-gray-200 rounded-bl-none'
-                  }`}
+                  className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  <p className="text-sm">{msg.text}</p>
-                  <p className="text-xs mt-1 opacity-70">
-                    {msg.timestamp.toLocaleTimeString('en-US', {
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </p>
+                  <div
+                    className={`max-w-xs px-4 py-2 rounded-lg ${
+                      msg.sender === 'user'
+                        ? 'bg-primary-600 text-white rounded-br-none'
+                        : 'bg-white text-gray-800 border border-gray-200 rounded-bl-none'
+                    }`}
+                  >
+                    <p className="text-sm">{msg.text}</p>
+                    <p className="text-xs mt-1 opacity-70">
+                      {msg.timestamp.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </p>
+                  </div>
                 </div>
+                
+                {/* Route suggestion button */}
+                {msg.route && SERVICE_ROUTES[msg.route.service] && (
+                  <div className="flex justify-start mt-2">
+                    <button
+                      onClick={() => navigate(SERVICE_ROUTES[msg.route.service].path)}
+                      className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white 
+                                text-xs px-3 py-2 rounded-lg w-max transition-all"
+                    >
+                      {SERVICE_ROUTES[msg.route.service].icon}
+                      View {SERVICE_ROUTES[msg.route.service].label} →
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
             {loading && (

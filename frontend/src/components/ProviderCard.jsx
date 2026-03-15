@@ -2,16 +2,38 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { Star, MapPin, Heart } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
-import Avatar from './Avatar'
 
 export default function ProviderCard({ provider, user }) {
   const { t } = useLanguage()
+
+  const getInitials = (name) => {
+    if (!name) return '?'
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+  }
+
   return (
     <div className="provider-card-hover bg-white rounded-lg overflow-hidden border border-gray-200">
       {/* Provider Photo */}
       <div className="relative h-48 bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
-        <div className="scale-150">
-          <Avatar provider={user} size="lg" />
+        <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
+          {(user?.profile_photo || provider?.profile_photo) ? (
+            <img
+              src={user?.profile_photo || provider?.profile_photo}
+              alt={user?.name}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.style.display = 'none'
+                e.target.nextSibling.style.display = 'flex'
+              }}
+            />
+          ) : null}
+          <div
+            className="w-full h-full bg-gradient-to-br from-purple-400 to-purple-600 
+                       items-center justify-center font-bold text-white text-xl"
+            style={{ display: (user?.profile_photo || provider?.profile_photo) ? 'none' : 'flex' }}
+          >
+            {getInitials(user?.name)}
+          </div>
         </div>
         
         {/* Women First Badge */}

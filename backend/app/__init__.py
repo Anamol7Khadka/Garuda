@@ -49,11 +49,19 @@ def create_app(config_name="development"):
     app.register_blueprint(ai.bp)
     
     # Static file serving for uploads
+    import os
     from flask import send_from_directory
+    
+    # Ensure uploads directory exists
+    os.makedirs('uploads', exist_ok=True)
+    os.makedirs('uploads/profiles', exist_ok=True)
     
     @app.route('/uploads/<path:filename>')
     def serve_upload(filename):
-        return send_from_directory('uploads', filename)
+        response = send_from_directory('uploads', filename)
+        response.headers['Cache-Control'] = 'public, max-age=3600'
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
     
     # Create tables
     with app.app_context():

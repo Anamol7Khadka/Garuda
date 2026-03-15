@@ -13,6 +13,7 @@ def list_providers():
     try:
         city = request.args.get('city')
         category_id = request.args.get('category_id', type=int)
+        category_name = request.args.get('category')
         min_rating = request.args.get('min_rating', type=float, default=0)
         women_first = request.args.get('women_first', 'false').lower() == 'true'
         page = request.args.get('page', type=int, default=1)
@@ -32,11 +33,27 @@ def list_providers():
             query = query.filter(User.is_female == True)
         if min_rating > 0:
             query = query.filter(Provider.rating >= min_rating)
+        
+        # Support filtering by category_id
         if category_id:
             query = query.join(Service, Service.provider_id == Provider.id).filter(
                 Service.category_id == category_id,
                 Service.is_active == True
             )
+        # Support filtering by category name (from chatbot routing)
+        elif category_name:
+            # Import ServiceCategory model to filter by name
+            try:
+                from app.models.service import ServiceCategory
+                query = query.join(Service, Service.provider_id == Provider.id).join(
+                    ServiceCategory, Service.category_id == ServiceCategory.id
+                ).filter(
+                    ServiceCategory.name.ilike(f'%{category_name}%'),
+                    Service.is_active == True
+                )
+            except ImportError:
+                # Fallback if ServiceCategory not available
+                pass
 
         total = query.count()
 

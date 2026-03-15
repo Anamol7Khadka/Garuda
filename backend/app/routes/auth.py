@@ -209,11 +209,19 @@ def upload_photo():
         user.profile_photo = photo_url
         db.session.commit()
         
+        # Verify the update was saved
+        refreshed_user = User.query.get(user_id)
+        
         return jsonify({
-            'data': {'photo_url': photo_url},
+            'data': {
+                'photo_url': photo_url,
+                'user': refreshed_user.to_dict()
+            },
             'message': 'Photo uploaded successfully'
         }), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e), 'code': 'UPLOAD_ERROR'}), 500
 

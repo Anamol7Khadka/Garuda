@@ -1,28 +1,54 @@
 import { useState, useRef } from 'react'
 import client from '../api/client'
 
-export default function PhotoUpload({ currentPhoto, onUpload, size = 'lg' }) {
+export default function PhotoUpload({ 
+  currentPhoto, 
+  onUpload, 
+  size = 'lg',
+  name = ''
+}) {
   const [uploading, setUploading] = useState(false)
-  const [preview, setPreview] = useState(currentPhoto)
+  const [preview, setPreview] = useState(currentPhoto || null)
+  const [error, setError] = useState(null)
   const fileRef = useRef(null)
 
-  const sizes = {
-    sm: 'w-12 h-12',
-    md: 'w-20 h-20', 
-    lg: 'w-32 h-32',
-    xl: 'w-40 h-40'
+  const sizeClasses = {
+    sm: 'w-12 h-12 text-lg',
+    md: 'w-20 h-20 text-2xl',
+    lg: 'w-28 h-28 text-3xl',
+    xl: 'w-36 h-36 text-4xl'
   }
 
+  // Generate colored initials avatar if no photo
+  const getInitials = () => {
+    if (!name) return '👤'
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+  }
+
+  const handleClick = () => fileRef.current?.click()
+
   const handleFileChange = async (e) => {
-    const file = e.target.files[0]
+    const file = e.target.files?.[0]
     if (!file) return
 
-    // Preview
+    setError(null)
+
+    // Validate
+    if (!['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.type)) {
+      setError('Please upload a JPG, PNG or WebP image')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Image must be under 5MB')
+      return
+    }
+
+    // Show preview immediately
     const reader = new FileReader()
     reader.onload = (e) => setPreview(e.target.result)
     reader.readAsDataURL(file)
 
-    // Upload
+    // Upload to server
     setUploading(true)
     try {
       const formData = new FormData()
@@ -30,58 +56,63 @@ export default function PhotoUpload({ currentPhoto, onUpload, size = 'lg' }) {
       const res = await client.post('/api/auth/upload-photo', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
-      const photoUrl = res.data?.data?.photo_url
-      if (onUpload) {
-        onUpload(photoUrl)
-      }
-      // Give backend time to complete the transaction
-      await new Promise(resolve => setTimeout(resolve, 500))
+      const url = res.data?.data?.photo_url
+      if (url && onUpload) onUpload(url)
     } catch (err) {
-      console.error('Upload failed:', err)
-      setPreview(currentPhoto) // Revert preview on error
-      alert('Upload failed. Please try again.')
+      setError('Upload failed. Please try again.')
+      setPreview(currentPhoto || null)
     } finally {
       setUploading(false)
     }
   }
 
   return (
-    <div className="relative inline-block">
+    <div className="flex flex-col items-center gap-2">
       <div
-        className={`${sizes[size]} rounded-full overflow-hidden border-4 
-                   border-purple-200 shadow-lg cursor-pointer relative group`}
-        onClick={() => fileRef.current?.click()}
+        onClick={handleClick}
+        className={`${sizeClasses[size]} rounded-full overflow-hidden 
+                   border-4 border-purple-200 shadow-lg cursor-pointer 
+                   relative group flex-shrink-0`}
       >
         {preview ? (
-          <img src={preview} alt="Profile" className="w-full h-full object-cover" />
+          <img
+            src={preview}
+            alt="Profile"
+            className="w-full h-full object-cover"
+            onError={() => setPreview(null)}
+          />
         ) : (
-          <div className="w-full h-full bg-purple-100 flex items-center 
-                          justify-center text-purple-600 font-bold text-2xl">
-            👤
+          <div className="w-full h-full bg-gradient-to-br from-purple-400 
+                          to-purple-600 flex items-center justify-center 
+                          font-bold text-white">
+            {getInitials()}
           </div>
         )}
+
         {/* Hover overlay */}
-        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 
-                        transition-opacity flex items-center justify-center">
-          <span className="text-white text-xs font-medium">
-            {uploading ? '⏳' : '📷 Change'}
-          </span>
+        <div className="absolute inset-0 bg-black/50 opacity-0 
+                        group-hover:opacity-100 transition-opacity 
+                        flex flex-col items-center justify-center gap-1">
+          {uploading ? (
+            <div className="w-6 h-6 border-2 border-white border-t-transparent 
+                            rounded-full animate-spin" />
+          ) : (
+            <>
+              <span className="text-white text-xl">📷</span>
+              <span className="text-white text-xs font-medium">Change Photo</span>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Upload indicator */}
-      {uploading && (
-        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-purple-600 
-                        rounded-full flex items-center justify-center">
-          <div className="w-3 h-3 border-2 border-white border-t-transparent 
-                          rounded-full animate-spin" />
-        </div>
+      {error && (
+        <p className="text-red-500 text-xs text-center max-w-32">{error}</p>
       )}
 
       <input
         ref={fileRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/gif,image/webp"
         onChange={handleFileChange}
         className="hidden"
       />

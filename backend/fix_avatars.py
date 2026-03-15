@@ -3,32 +3,56 @@ Fix avatars for existing users in the database
 Run with: python fix_avatars.py
 """
 
-from app import create_app, db
-from app.models import User
+import os
+from dotenv import load_dotenv
 
-app = create_app('development')
+# Load env first
+load_dotenv()
 
-def get_avatar(name, is_female=False):
-    """Generate avatar URL from UI Avatars API"""
-    bg = 'C084FC' if is_female else '6366F1'  # purple for women, indigo for men
-    color = 'ffffff'
-    name_encoded = name.replace(' ', '+')
-    return f"https://ui-avatars.com/api/?name={name_encoded}&background={bg}&color={color}&size=200&bold=true&rounded=true"
+# Simple approach - connect directly
+import psycopg2
 
-def fix_avatars():
-    with app.app_context():
-        users = User.query.all()
-        updated_count = 0
-        
-        for user in users:
-            if not user.profile_photo:
-                bg = 'C084FC' if user.is_female else '6366F1'
-                user.profile_photo = get_avatar(user.name, user.is_female)
-                updated_count += 1
-        
-        db.session.commit()
-        print(f"✅ Updated {updated_count} user avatars")
-        print(f"📊 Total users with avatars: {len([u for u in User.query.all() if u.profile_photo])}")
-
-if __name__ == '__main__':
-    fix_avatars()
+try:
+    conn = psycopg2.connect(
+        dbname=os.getenv('POSTGRES_DB', 'sewasathi'),
+        user=os.getenv('POSTGRES_USER', 'postgres'),
+        password=os.getenv('POSTGRES_PASSWORD', 'sewasathi123'),
+        host=os.getenv('POSTGRES_HOST', 'localhost'),
+        port=os.getenv('POSTGRES_PORT', '5432')
+    )
+    cur = conn.cursor()
+    
+    # Get users without profile_photo
+    cur.execute("SELECT id, name, is_female FROM users WHERE profile_photo IS NULL")
+    users = cur.fetchall()
+    
+    updated = 0
+    for user_id, name, is_female in users:
+        bg = 'C084FC' if is_female else '6366F1'
+        name_encoded = name.replace(' ', '+')
+        avatar_url = (
+            f"https://ui-avatars.com/api/"
+            f"?name={name_encoded}"
+            f"&background={bg}"
+            f"&color=ffffff"
+            f"&size=200"
+            f"&bold=true"
+            f"&rounded=true"
+        )
+        cur.execute("UPDATE users SET profile_photo = %s WHERE id = %s", (avatar_url, user_id))
+        updated += 1
+    
+    conn.commit()
+    print(f"✅ Updated {updated} user avatars")
+    
+    # Check total with avatars
+    cur.execute("SELECT COUNT(*) FROM users WHERE profile_photo IS NOT NULL")
+    total = cur.fetchone()[0]
+    print(f"📊 Total users with profile photos: {total}")
+    
+    cur.close()
+    conn.close()
+    
+except Exception as e:
+    print(f"❌ Error: {e}")
+    print("Make sure PostgreSQL is running and DATABASE_URL is correct")

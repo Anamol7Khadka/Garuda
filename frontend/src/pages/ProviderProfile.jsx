@@ -39,17 +39,37 @@ export default function ProviderProfile() {
 
   const user = { name: provider.name, city: provider.city, profile_photo: provider.profile_photo, is_female: provider.is_female }
 
+  const getInitials = (name) => {
+    if (!name) return '?'
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
           <div className="h-48 bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
-            {provider.profile_photo ? (
-              <img src={provider.profile_photo} alt={provider.name} className="w-40 h-40 rounded-full object-cover" />
-            ) : (
-              <span className="text-9xl">👤</span>
-            )}
+            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg">
+              {provider.profile_photo ? (
+                <img
+                  src={provider.profile_photo}
+                  alt={provider.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.style.display = 'none'
+                    e.target.nextSibling.style.display = 'flex'
+                  }}
+                />
+              ) : null}
+              <div
+                className="w-full h-full bg-gradient-to-br from-purple-400 to-purple-600 
+                           items-center justify-center font-bold text-white text-3xl"
+                style={{ display: provider.profile_photo ? 'none' : 'flex' }}
+              >
+                {getInitials(provider.name)}
+              </div>
+            </div>
           </div>
 
           <div className="p-8">

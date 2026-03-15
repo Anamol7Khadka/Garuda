@@ -16,6 +16,7 @@ export default function Services() {
     city: searchParams.get('city') || '',
     women_first: searchParams.get('women_first') === 'true',
     min_rating: 0,
+    category: searchParams.get('category') || '',
     category_id: searchParams.get('category_id') || '',
     page: 1
   })
@@ -63,6 +64,9 @@ export default function Services() {
       if (filters.category_id && filters.category_id !== '') {
         params.category_id = filters.category_id
       }
+      if (filters.category && filters.category !== '') {
+        params.category = filters.category
+      }
       const response = await api.get('/api/providers', { params })
       const data =
         response.data?.data?.providers ||
@@ -100,6 +104,20 @@ export default function Services() {
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2 text-gray-800">{t('allServices')}</h1>
         </div>
+
+        {/* Active category badge */}
+        {filters.category && (
+          <div className="flex items-center gap-2 mb-4">
+            <span className="bg-purple-100 text-purple-700 px-4 py-2 rounded-full 
+                           text-sm font-semibold flex items-center gap-2">
+              Showing: {filters.category.replace(/_/g, ' ').toUpperCase()} providers
+              <button onClick={() => setFilters(prev => ({...prev, category: '', page: 1}))}
+                      className="ml-2 hover:text-purple-900">
+                ✕
+              </button>
+            </span>
+          </div>
+        )}
 
         {/* Main layout */}
         <div className="flex gap-8">

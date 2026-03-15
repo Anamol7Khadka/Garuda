@@ -14,14 +14,20 @@ export default function ProviderDashboard() {
   const [stats, setStats] = useState({})
   const [loading, setLoading] = useState(false)
 
-  const handlePhotoUpload = async () => {
+  const handlePhotoUpload = async (photoUrl) => {
     try {
-      // Refetch user from backend
+      // Refetch user from backend to get updated profile_photo
       const response = await api.get('/api/auth/me')
       const updatedUser = response.data?.data || response.data
-      updateUser(updatedUser)
+      if (updatedUser) {
+        updateUser(updatedUser)
+      }
     } catch (error) {
       console.error('Failed to refresh user after photo upload:', error)
+      // Still try to show the new photo even if refresh fails
+      if (user) {
+        updateUser({ ...user, profile_photo: photoUrl })
+      }
     }
   }
 
@@ -79,15 +85,58 @@ export default function ProviderDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center gap-6 mb-8">
-          <PhotoUpload 
-            currentPhoto={user?.profile_photo}
-            onUpload={handlePhotoUpload}
-            size="lg"
-          />
-          <div>
-            <h1 className="text-4xl font-bold mb-2">{t('providerDashboard')}</h1>
-            <p className="text-gray-600">{t('helloUser')}, {user?.name}!</p>
+        {/* Profile Section */}
+        <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+          <div className="flex items-center gap-6">
+            <PhotoUpload
+              currentPhoto={user?.profile_photo}
+              size="xl"
+              name={user?.name}
+              onUpload={(url) => updateUser({ ...user, profile_photo: url })}
+            />
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-1">
+                <h1 className="text-2xl font-bold text-gray-900">{user?.name}</h1>
+                {user?.is_female && (
+                  <span className="bg-purple-100 text-purple-700 text-xs 
+                                   font-semibold px-2.5 py-1 rounded-full">
+                    💜 Women First Provider
+                  </span>
+                )}
+              </div>
+              <p className="text-gray-500 text-sm">{user?.email}</p>
+              <p className="text-gray-500 text-sm">📍 {user?.city || 'Kathmandu'}</p>
+              <div className="flex items-center gap-2 mt-2">
+                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+                  user?.provider?.is_available
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-red-100 text-red-700'
+                }`}>
+                  {user?.provider?.is_available ? '🟢 Available' : '🔴 Unavailable'}
+                </span>
+                <span className="text-xs bg-yellow-100 text-yellow-700 
+                                 font-semibold px-2.5 py-1 rounded-full">
+                  ⭐ {user?.provider?.rating?.toFixed(1) || 'New'} · {user?.provider?.trust_badge || 'New'}
+                </span>
+              </div>
+              <p className="text-xs text-gray-400 mt-2">
+                Click the photo to upload a new one
+              </p>
+            </div>
+            <div className="hidden md:flex gap-4 text-center">
+              <div className="bg-green-50 rounded-xl px-5 py-3">
+                <div className="text-2xl font-bold text-green-600">
+                  Rs.{user?.provider?.total_earnings?.toLocaleString() || 0}
+                </div>
+                <div className="text-xs text-gray-500 mt-0.5">Total Earned</div>
+              </div>
+              <div className="bg-purple-50 rounded-xl px-5 py-3">
+                <div className="text-2xl font-bold text-purple-700">
+                  {user?.provider?.total_jobs || 0}
+                </div>
+                <div className="text-xs text-gray-500 mt-0.5">Jobs Done</div>
+              </div>
+            </div>
           </div>
         </div>
 

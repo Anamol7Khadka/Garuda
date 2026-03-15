@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, Users, Shield, MapPin, Zap } from 'lucide-react'
 import ProviderCard from '../components/ProviderCard'
+import HomeChat from '../components/HomeChat'
 import api from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
@@ -10,7 +11,6 @@ export default function Home() {
   const { isAuthenticated } = useAuth()
   const { t } = useLanguage()
   const [featuredProviders, setFeaturedProviders] = useState([])
-  const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -41,12 +41,6 @@ export default function Home() {
     }
   }
 
-  const handleSearch = (e) => {
-    e.preventDefault()
-    // Navigate to services with search query
-    window.location.href = `/services?search=${searchQuery}`
-  }
-
   const categories = [
     { name: 'Plumbing', emoji: '🔧', icon: '🚰' },
     { name: 'Cleaning', emoji: '🧹', icon: '✨' },
@@ -60,63 +54,69 @@ export default function Home() {
 
   return (
     <div className="w-full">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary-700 via-primary-600 to-purple-600 text-white py-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-5xl md:text-6xl font-bold mb-4">
-              {t('heroTitle_new')}
-            </h1>
-            <p className="text-xl text-primary-100 mb-8">
-              {t('heroSubtitle_new')}
-            </p>
-          </div>
+      {/* Hero Section with Chat */}
+      <section className="bg-gradient-to-br from-purple-700 via-purple-600 to-purple-800 
+                          min-h-[85vh] flex items-center relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-20 left-10 w-64 h-64 bg-white rounded-full blur-3xl"/>
+          <div className="absolute bottom-20 right-10 w-80 h-80 bg-pink-300 rounded-full blur-3xl"/>
+        </div>
 
-          {/* Search Bar */}
-          <form onSubmit={handleSearch} className="max-w-4xl mx-auto">
-            <div className="flex gap-4 bg-white rounded-lg p-2">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={t('searchPlaceholder_new')}
-                className="flex-1 px-4 py-3 text-black outline-none"
-              />
-              <button
-                type="submit"
-                className="bg-primary-700 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-800 transition-colors flex items-center gap-2"
-              >
-                <Search size={20} />
-                {t('home')}
-              </button>
-            </div>
-          </form>
+        <div className="max-w-7xl mx-auto px-4 py-16 w-full relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            
+            {/* Left — Hero text */}
+            <div className="text-white">
+              <div className="inline-flex items-center gap-2 bg-white/20 rounded-full 
+                              px-4 py-2 text-sm font-medium mb-6">
+                <span>💜</span>
+                <span>60%+ Women-Led Services</span>
+              </div>
+              <h1 className="text-5xl lg:text-6xl font-black leading-tight mb-4">
+                {t('heroTitle')}
+              </h1>
+              <p className="text-purple-200 text-lg leading-relaxed mb-8">
+                {t('heroSubtitle')}
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <a href="/services"
+                   className="bg-white text-purple-700 font-bold px-6 py-3 rounded-xl 
+                              hover:bg-purple-50 transition-all shadow-lg">
+                  {t('exploreServices')}
+                </a>
+                <a href="/find-nearby"
+                   className="bg-white/20 text-white font-bold px-6 py-3 rounded-xl 
+                              hover:bg-white/30 transition-all border border-white/30">
+                  🗺️ {t('findNearby')}
+                </a>
+              </div>
 
-          {/* Find Nearby Button */}
-          {isAuthenticated && (
-            <div className="text-center mt-4">
-              <a href="/find-nearby"
-                className="inline-flex items-center gap-2 bg-white text-primary-700 
-                           font-semibold px-6 py-3 rounded-xl shadow-md 
-                           hover:shadow-lg transition-all border border-primary-100">
-                🗺️ {t('findNearby')}
-              </a>
+              {/* Stats */}
+              <div className="flex gap-6 mt-10">
+                <div>
+                  <div className="text-3xl font-black">500+</div>
+                  <div className="text-purple-300 text-sm">Verified Providers</div>
+                </div>
+                <div className="w-px bg-white/20"/>
+                <div>
+                  <div className="text-3xl font-black">10K+</div>
+                  <div className="text-purple-300 text-sm">Happy Customers</div>
+                </div>
+                <div className="w-px bg-white/20"/>
+                <div>
+                  <div className="text-3xl font-black">4.9⭐</div>
+                  <div className="text-purple-300 text-sm">Average Rating</div>
+                </div>
+              </div>
             </div>
-          )}
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 mt-16 text-center">
-            <div>
-              <p className="text-3xl font-bold">10K+</p>
-              <p className="text-primary-100">सेवा प्रदान गर्नेहरू</p>
-            </div>
-            <div>
-              <p className="text-3xl font-bold">50K+</p>
-              <p className="text-primary-100">सन्तुष्ट ग्राहकहरू</p>
-            </div>
-            <div>
-              <p className="text-3xl font-bold">6000+</p>
-              <p className="text-primary-100">महिला सेवा प्रदान गर्नेहरू</p>
+            {/* Right — Embedded Chatbot */}
+            <div className="w-full">
+              <p className="text-purple-200 text-sm font-medium mb-3 text-center">
+                💬 Tell us what you need — our AI will find the right person
+              </p>
+              <HomeChat />
             </div>
           </div>
         </div>
