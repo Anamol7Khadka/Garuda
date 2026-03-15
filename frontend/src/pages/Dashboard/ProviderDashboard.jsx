@@ -98,25 +98,25 @@ export default function ProviderDashboard() {
               <div className="flex items-center gap-3 mb-1">
                 <h1 className="text-2xl font-bold text-gray-900">{user?.name}</h1>
                 {user?.is_female && (
-                  <span className="bg-purple-100 text-purple-700 text-xs 
+                  <span className="bg-purple-300 text-purple-600 text-xs 
                                    font-semibold px-2.5 py-1 rounded-full">
-                    💜 Women First Provider
+                    Women First Provider
                   </span>
                 )}
               </div>
               <p className="text-gray-500 text-sm">{user?.email}</p>
-              <p className="text-gray-500 text-sm">📍 {user?.city || 'Kathmandu'}</p>
+              <p className="text-gray-500 text-sm">{user?.city || 'Kathmandu'}</p>
               <div className="flex items-center gap-2 mt-2">
                 <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
                   user?.provider?.is_available
                     ? 'bg-green-100 text-green-700'
                     : 'bg-red-100 text-red-700'
                 }`}>
-                  {user?.provider?.is_available ? '🟢 Available' : '🔴 Unavailable'}
+                  {user?.provider?.is_available ? 'Available' : 'Unavailable'}
                 </span>
                 <span className="text-xs bg-yellow-100 text-yellow-700 
                                  font-semibold px-2.5 py-1 rounded-full">
-                  ⭐ {user?.provider?.rating?.toFixed(1) || 'New'} · {user?.provider?.trust_badge || 'New'}
+                  {user?.provider?.rating?.toFixed(1) || 'New'} · {user?.provider?.trust_badge || 'New'}
                 </span>
               </div>
               <p className="text-xs text-gray-400 mt-2">
@@ -130,8 +130,8 @@ export default function ProviderDashboard() {
                 </div>
                 <div className="text-xs text-gray-500 mt-0.5">Total Earned</div>
               </div>
-              <div className="bg-purple-50 rounded-xl px-5 py-3">
-                <div className="text-2xl font-bold text-purple-700">
+              <div className="bg-purple-300/30 rounded-xl px-5 py-3">
+                <div className="text-2xl font-bold text-purple-600">
                   {user?.provider?.total_jobs || 0}
                 </div>
                 <div className="text-xs text-gray-500 mt-0.5">Jobs Done</div>
@@ -180,8 +180,8 @@ export default function ProviderDashboard() {
 
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center gap-4">
-              <div className="bg-purple-100 p-4 rounded-lg">
-                <Award className="text-purple-700" size={32} />
+              <div className="bg-purple-300 p-4 rounded-lg">
+                <Award className="text-purple-600" size={32} />
               </div>
               <div>
                 <p className="text-gray-600">{t('averageRating')}</p>
@@ -197,7 +197,7 @@ export default function ProviderDashboard() {
           
           {loading ? (
             <div className="text-center py-12">
-              <div className="inline-block w-12 h-12 border-4 border-primary-300 border-t-primary-700 rounded-full animate-spin"></div>
+              <div className="inline-block w-12 h-12 border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
             </div>
           ) : bookings.length > 0 ? (
             <div className="space-y-4">
@@ -258,12 +258,12 @@ export default function ProviderDashboard() {
                         onClick={() => handleNavigateToCustomer(booking)}
                         className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 flex items-center gap-2"
                       >
-                        🗺️ Navigate to Customer
+                        Navigate to Customer
                       </button>
                       {booking.status === 'confirmed' && (
                         <button
                           onClick={() => handleStatusUpdate(booking.id, 'in_progress')}
-                          className="px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700"
+                          className="px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-600/90"
                         >
                           शुरू गर्नुहोस्
                         </button>

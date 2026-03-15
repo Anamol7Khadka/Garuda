@@ -79,7 +79,7 @@ export default function RouteMap({ providers = [], onProviderSelect, onLocationC
             justify-content:center;font-size:16px;cursor:pointer;transition:transform 0.2s"
             onmouseover="this.style.transform='scale(1.2)'"
             onmouseout="this.style.transform='scale(1)'">
-            ${p.is_female ? '💜' : '👤'}
+            ${p.is_female ? 'F' : 'M'}
           </div>`
 
         new maplibregl.Marker({ element: el })
@@ -88,7 +88,7 @@ export default function RouteMap({ providers = [], onProviderSelect, onLocationC
             <div style="font-family:Inter,sans-serif;padding:8px">
               <strong>${p.name}</strong>
               ${p.is_female
-                ? '<span style="color:#7C3AED;font-size:11px"> 💜 Women First</span>'
+                ? '<span style="color:#7C3AED;font-size:11px"> Women First</span>'
                 : ''}
               <div style="font-size:12px;color:#6B7280;margin-top:2px">
                 ⭐ ${p.provider?.rating?.toFixed(1) || 'New'} · ${p.city || 'Kathmandu'}
@@ -258,13 +258,13 @@ export default function RouteMap({ providers = [], onProviderSelect, onLocationC
       {routeInfo && (
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10
                         bg-white rounded-2xl shadow-xl p-4 min-w-[260px]
-                        border border-purple-100">
-          <p className="font-bold text-sm text-purple-700 mb-3">
+                        border border-purple-300">
+          <p className="font-bold text-sm text-purple-600 mb-3">
             🗺️ Route to {routeInfo.provider}
           </p>
           <div className="flex gap-4 text-center">
             <div>
-              <div className="text-2xl font-bold text-purple-700">{routeInfo.distance}</div>
+              <div className="text-2xl font-bold text-purple-600">{routeInfo.distance}</div>
               <div className="text-xs text-gray-500">{t('kmAway')}</div>
             </div>
             <div className="w-px bg-gray-200" />

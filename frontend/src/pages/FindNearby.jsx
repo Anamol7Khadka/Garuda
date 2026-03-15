@@ -87,7 +87,7 @@ export default function FindNearby() {
                         justify-between flex-wrap gap-3">
           <div>
             <h1 className="text-xl font-bold text-gray-900">
-              🗺️ {t('findNearbyTitle')}
+              {t('findNearbyTitle')}
             </h1>
             <p className="text-sm text-gray-500">
               {t('clickToRoute')}
@@ -113,10 +113,10 @@ export default function FindNearby() {
                          text-sm font-semibold transition-all ${
                 femaleOnly
                   ? 'bg-purple-600 text-white shadow-md'
-                  : 'bg-white border border-purple-200 text-purple-700'
+                  : 'bg-white border border-purple-300 text-purple-600'
               }`}
             >
-              💜 {t('showWomenFirst')}
+              {t('showWomenFirst')}
             </button>
           </div>
         </div>
@@ -156,14 +156,14 @@ export default function FindNearby() {
                 className={`bg-white rounded-xl p-4 shadow-sm cursor-pointer 
                            border-2 transition-all hover:shadow-md ${
                   selectedProvider?.id === provider.id
-                    ? 'border-purple-500 bg-purple-50'
+                    ? 'border-purple-600 bg-purple-300/20'
                     : 'border-transparent'
                 }`}
               >
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-purple-100 
+                  <div className="w-10 h-10 rounded-full bg-purple-300 
                                   flex items-center justify-center text-lg flex-shrink-0">
-                    {provider.is_female ? '💜' : '👤'}
+                    {provider.is_female ? 'F' : 'M'}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1 flex-wrap">
@@ -171,7 +171,7 @@ export default function FindNearby() {
                         {provider.name}
                       </span>
                       {provider.is_female && (
-                        <span className="text-xs bg-purple-100 text-purple-700 
+                        <span className="text-xs bg-purple-300 text-purple-600 
                                         px-1.5 py-0.5 rounded-full font-medium">
                           Women First
                         </span>
@@ -180,9 +180,6 @@ export default function FindNearby() {
                     <div className="text-xs text-gray-500 mt-0.5">
                       ⭐ {provider.provider?.rating?.toFixed(1) || 'New'} 
                       · {provider.city}
-                    </div>
-                    <div className="text-xs text-purple-600 font-medium mt-1">
-                      Rs. {provider.provider?.hourly_rate || '---'}/hr
                     </div>
                   </div>
                 </div>
@@ -197,7 +194,7 @@ export default function FindNearby() {
                       navigate(`/booking?${params.toString()}`)
                     }}
                     className="flex-1 bg-purple-600 text-white text-xs 
-                               font-semibold py-2 rounded-lg hover:bg-purple-700 transition"
+                               font-semibold py-2 rounded-lg hover:bg-purple-600/90 transition"
                   >
                     {t('bookNow')}
                   </button>

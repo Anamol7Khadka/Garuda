@@ -48,8 +48,8 @@ export default function AdminDashboard() {
 
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center gap-4">
-              <div className="bg-purple-100 p-4 rounded-lg">
-                <CheckCircle className="text-purple-700" size={32} />
+              <div className="bg-purple-300 p-4 rounded-lg">
+                <CheckCircle className="text-purple-600" size={32} />
               </div>
               <div>
                 <p className="text-gray-600">पूरा भएका कामहरू</p>
@@ -87,16 +87,16 @@ export default function AdminDashboard() {
             <h2 className="text-2xl font-bold mb-4">महिला प्रदान गर्नेहरूलाई फिचर गर्नुहोस्</h2>
             <div className="space-y-3">
               <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                <p className="font-semibold">💜 अनिता पौडेल</p>
+                  <p className="font-semibold">अनिता पौडेल</p>
                 <p className="text-sm text-gray-600">सफाई सेवा | रेटिङ: 4.9</p>
-                <button className="mt-2 px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700">
+                <button className="mt-2 px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-600/90">
                   फिचर गर्नुहोस्
                 </button>
               </div>
               <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                <p className="font-semibold">💜 राधा सिंह</p>
+                <p className="font-semibold">राधा सिंह</p>
                 <p className="text-sm text-gray-600">सौन्दर्य सेवा | रेटिङ: 4.8</p>
-                <button className="mt-2 px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700">
+                <button className="mt-2 px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-600/90">
                   फिचर गर्नुहोस्
                 </button>
               </div>

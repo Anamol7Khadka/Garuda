@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from app import db
 from app.models import User, Provider
+from app.models.service import Service, ServiceCategory
 from datetime import datetime
 
 bp = Blueprint('auth', __name__, url_prefix='/api/auth')
@@ -38,11 +39,30 @@ def register():
         
         # If provider, create provider profile with skills
         if user.role == 'provider':
+            selected_skills = data.get('skills', []) or []
+            # Ensure skills are ints and unique
+            skill_ids = list({int(s) for s in selected_skills if str(s).isdigit()})
+
             provider = Provider(
                 user_id=user.id,
-                skills=data.get('skills', [])
+                skills=skill_ids
             )
             db.session.add(provider)
+            db.session.flush()  # get provider.id for services
+
+            # Create baseline services for each selected category so filters work
+            if skill_ids:
+                categories = ServiceCategory.query.filter(ServiceCategory.id.in_(skill_ids)).all()
+                for cat in categories:
+                    db.session.add(Service(
+                        provider_id=provider.id,
+                        category_id=cat.id,
+                        title=cat.name,
+                        description=cat.description or f"{cat.name} service",
+                        price=cat.base_price or 0,
+                        price_type='fixed',
+                        is_active=True
+                    ))
         
         db.session.commit()
         

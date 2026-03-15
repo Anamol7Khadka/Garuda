@@ -14,7 +14,7 @@ export default function ProvidersMap({
   if (!supabase) {
     return (
       <div className="w-full h-full rounded-2xl bg-gray-100 flex items-center justify-center text-gray-500 text-sm">
-        🗺️ Map coming soon — configure Supabase to enable live provider map
+        Map coming soon — configure Supabase to enable live provider map
       </div>
     )
   }
@@ -164,7 +164,7 @@ export default function ProvidersMap({
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
                 <strong style="font-size:14px">${props.name}</strong>
                 ${props.is_female
-                  ? '<span style="font-size:11px;color:#7C3AED;font-weight:600">💜 Women First</span>'
+                  ? '<span style="font-size:11px;color:#7C3AED;font-weight:600">Women First</span>'
                   : ''}
               </div>
               <div style="font-size:12px;color:#6B7280;margin-bottom:2px">
@@ -221,7 +221,7 @@ export default function ProvidersMap({
         <p className="font-semibold text-gray-700 mb-1">Providers</p>
         <div className="flex items-center gap-2">
           <span className="w-3 h-3 rounded-full bg-purple-600 inline-block ring-2 ring-white shadow"/>
-          <span className="text-gray-600">Women First 💜</span>
+          <span className="text-gray-600">Women First</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="w-3 h-3 rounded-full bg-blue-500 inline-block ring-2 ring-white shadow"/>
@@ -231,9 +231,9 @@ export default function ProvidersMap({
 
       {/* Women First filter indicator */}
       <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm 
-                      rounded-xl px-3 py-2 shadow-lg border border-purple-100 
-                      text-xs font-semibold text-purple-700">
-        {showFemaleOnly ? '💜 Showing Women First' : '🗺️ All Providers'}
+                      rounded-xl px-3 py-2 shadow-lg border border-purple-300 
+                      text-xs font-semibold text-purple-600">
+        {showFemaleOnly ? 'Showing Women First' : 'All Providers'}
       </div>
     </div>
   );

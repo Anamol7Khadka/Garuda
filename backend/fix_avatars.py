@@ -28,7 +28,7 @@ try:
     
     updated = 0
     for user_id, name, is_female in users:
-        bg = 'C084FC' if is_female else '6366F1'
+        bg = 'C0392B' if is_female else 'A05A2C'  # brand primary / warm brown
         name_encoded = name.replace(' ', '+')
         avatar_url = (
             f"https://ui-avatars.com/api/"

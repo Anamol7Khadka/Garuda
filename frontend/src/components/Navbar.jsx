@@ -19,19 +19,25 @@ export default function Navbar() {
   const isActive = (path) => location.pathname === path
 
   return (
-    <nav className="sticky top-0 z-50 bg-white shadow-md">
+    <nav className="sticky top-0 z-50 bg-white border-b border-[#F0F0F0] backdrop-blur">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 font-bold text-2xl text-primary-700">
-            <span className="text-purple-600">सेवा</span>Sathi
+          <Link to="/" className="flex items-center gap-2 font-bold text-2xl" style={{ color: 'var(--c-secondary)' }}>
+            <img
+              src="/garuda.jpeg"
+              alt="Garuda logo"
+              className="h-9 w-9 rounded-full border"
+              style={{ borderColor: 'var(--c-border)', boxShadow: 'var(--shadow-soft)' }}
+            />
+            <span style={{ color: 'var(--c-primary)' }}>Garuda</span>
           </Link>
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-8">
             <Link 
               to="/" 
-              className={`flex items-center gap-1 ${isActive('/') ? 'text-primary-700 font-semibold' : 'text-gray-600 hover:text-primary-700'}`}
+              className={`flex items-center gap-1 text-sm font-medium ${isActive('/') ? 'text-[var(--c-primary)]' : 'text-[#333] hover:text-[var(--c-primary)]'}`}
             >
               <Home size={20} />
               {t('home')}
@@ -39,7 +45,7 @@ export default function Navbar() {
             
             <Link 
               to="/services" 
-              className={`flex items-center gap-1 ${isActive('/services') ? 'text-primary-700 font-semibold' : 'text-gray-600 hover:text-primary-700'}`}
+              className={`flex items-center gap-1 text-sm font-medium ${isActive('/services') ? 'text-[var(--c-primary)]' : 'text-[#333] hover:text-[var(--c-primary)]'}`}
             >
               <Briefcase size={20} />
               {t('services')}
@@ -49,10 +55,10 @@ export default function Navbar() {
               <Link 
                 to="/find-nearby" 
                 className={`flex items-center gap-1 text-sm font-medium ${
-                  isActive('/find-nearby') ? 'text-primary-700 font-semibold' : 'text-gray-600 hover:text-primary-700'
+                  isActive('/find-nearby') ? 'text-[var(--c-primary)]' : 'text-[#333] hover:text-[var(--c-primary)]'
                 }`}
               >
-                🗺️ {t('findNearby')}
+                {t('findNearby')}
               </Link>
             )}
 
@@ -60,33 +66,23 @@ export default function Navbar() {
               <>
                 <Link 
                   to="/login" 
-                  className="px-4 py-2 text-gray-600 hover:text-primary-700 font-semibold"
+                  className="px-4 py-2 text-[#333] hover:text-[var(--c-primary)] font-semibold"
                 >
                   {t('login')}
                 </Link>
                 <Link 
                   to="/register" 
-                  className="px-6 py-2 bg-primary-700 text-white rounded-lg font-semibold hover:bg-primary-800"
+                  className="btn-primary"
                 >
                   {t('register')}
                 </Link>
               </>
             ) : (
               <div className="flex items-center gap-4">
-                {user?.role === 'customer' && (
+                {(user?.role === 'customer' || user?.role === 'provider') && (
                   <Link 
-                    to="/dashboard/customer"
-                    className="flex items-center gap-1 px-4 py-2 bg-primary-100 text-primary-700 rounded-lg hover:bg-primary-200"
-                  >
-                    <LayoutDashboard size={20} />
-                    {t('dashboard')}
-                  </Link>
-                )}
-                
-                {user?.role === 'provider' && (
-                  <Link 
-                    to="/dashboard/provider"
-                    className="flex items-center gap-1 px-4 py-2 bg-primary-100 text-primary-700 rounded-lg hover:bg-primary-200"
+                    to={user?.role === 'customer' ? '/dashboard/customer' : '/dashboard/provider'}
+                    className="flex items-center gap-2 px-4 py-2 bg-[#FDF0EE] text-[var(--c-primary)] rounded-lg border border-[#F7D4CF] hover:shadow-sm"
                   >
                     <LayoutDashboard size={20} />
                     {t('dashboard')}
@@ -96,18 +92,18 @@ export default function Navbar() {
                 {user?.role === 'admin' && (
                   <Link 
                     to="/dashboard/admin"
-                    className="flex items-center gap-1 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200"
+                    className="flex items-center gap-2 px-4 py-2 bg-[#FDF0EE] text-[var(--c-primary)] rounded-lg border border-[#F7D4CF] hover:shadow-sm"
                   >
                     <LayoutDashboard size={20} />
                     Admin
                   </Link>
                 )}
 
-                <div className="pl-4 border-l border-gray-300 flex items-center gap-3">
-                  <span className="text-sm text-gray-700">{user?.name}</span>
+                <div className="pl-4 border-l border-[#E5E5E5] flex items-center gap-3">
+                  <span className="text-sm text-[#333]">{user?.name}</span>
                   <button 
                     onClick={handleLogout}
-                    className="text-gray-600 hover:text-red-600"
+                    className="text-[#555] hover:text-[var(--c-primary)]"
                   >
                     <LogOut size={20} />
                   </button>
@@ -116,13 +112,13 @@ export default function Navbar() {
             )}
 
             {/* Language Switcher */}
-            <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+            <div className="flex items-center gap-1 bg-[#F3F2EF] rounded-lg p-1">
               <button
                 onClick={() => changeLanguage('en')}
                 className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
                   language === 'en'
-                    ? 'bg-white text-purple-700 shadow-sm font-bold'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-white text-[var(--c-primary)] shadow-sm font-bold'
+                    : 'text-[#666] hover:text-[var(--c-primary)]'
                 }`}
               >
                 EN
@@ -131,8 +127,8 @@ export default function Navbar() {
                 onClick={() => changeLanguage('np')}
                 className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
                   language === 'np'
-                    ? 'bg-white text-purple-700 shadow-sm font-bold'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-white text-[var(--c-primary)] shadow-sm font-bold'
+                    : 'text-[#666] hover:text-[var(--c-primary)]'
                 }`}
               >
                 नेपाली
@@ -142,7 +138,7 @@ export default function Navbar() {
 
           {/* Mobile Menu Button */}
           <button 
-            className="md:hidden"
+            className="md:hidden text-[#333]"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -154,14 +150,14 @@ export default function Navbar() {
           <div className="md:hidden pb-4 space-y-2">
             <Link 
               to="/" 
-              className="block px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+              className="block px-4 py-2 text-[#333] hover:bg-[#F3F2EF] rounded"
               onClick={() => setIsOpen(false)}
             >
               {t('home')}
             </Link>
             <Link 
               to="/services" 
-              className="block px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+              className="block px-4 py-2 text-[#333] hover:bg-[#F3F2EF] rounded"
               onClick={() => setIsOpen(false)}
             >
               {t('services')}
@@ -171,14 +167,14 @@ export default function Navbar() {
               <>
                 <Link 
                   to="/login" 
-                  className="block px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+                  className="block px-4 py-2 text-[#333] hover:bg-[#F3F2EF] rounded"
                   onClick={() => setIsOpen(false)}
                 >
                   {t('login')}
                 </Link>
                 <Link 
                   to="/register" 
-                  className="block px-4 py-2 bg-primary-700 text-white rounded"
+                  className="block px-4 py-2 text-white rounded" style={{ backgroundColor: 'var(--c-primary)' }}
                   onClick={() => setIsOpen(false)}
                 >
                   {t('register')}
@@ -189,7 +185,7 @@ export default function Navbar() {
                 {user?.role === 'customer' && (
                   <Link 
                     to="/dashboard/customer"
-                    className="block px-4 py-2 text-primary-700 hover:bg-primary-100 rounded"
+                    className="block px-4 py-2 text-[var(--c-primary)] hover:bg-[#FDF0EE] rounded"
                     onClick={() => setIsOpen(false)}
                   >
                     {t('dashboard')}
@@ -198,7 +194,7 @@ export default function Navbar() {
                 {user?.role === 'provider' && (
                   <Link 
                     to="/dashboard/provider"
-                    className="block px-4 py-2 text-primary-700 hover:bg-primary-100 rounded"
+                    className="block px-4 py-2 text-[var(--c-primary)] hover:bg-[#FDF0EE] rounded"
                     onClick={() => setIsOpen(false)}
                   >
                     Provider Dashboard
@@ -209,7 +205,7 @@ export default function Navbar() {
                     handleLogout()
                     setIsOpen(false)
                   }}
-                  className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-100 rounded"
+                  className="block w-full text-left px-4 py-2 text-[var(--c-primary)] hover:bg-[#FDF0EE] rounded"
                 >
                   Logout
                 </button>

@@ -12,7 +12,7 @@ const translations = {
     logout: 'Logout',
     
     // Home page
-    heroTitle: 'Book Trusted Home Services in Nepal',
+    heroTitle: 'Trusted Local Services Across Nepal',
     heroSubtitle: 'Professional services at your doorstep',
     searchPlaceholder: 'What service do you need?',
     bookNow: 'Book Now',
@@ -31,7 +31,7 @@ const translations = {
     mapView: 'Map View',
     filterByCity: 'Filter by City',
     filterByCategory: 'Filter by Category',
-    showWomenFirst: 'Show Women Providers First 💜',
+    showWomenFirst: 'Show Women Providers First',
     noProviders: 'No providers found',
     
     // Booking
@@ -58,9 +58,7 @@ const translations = {
     name: 'Full Name',
     phone: 'Phone Number',
     loginTitle: 'Welcome Back',
-    registerTitle: 'Join SewaSathi',
-    login: 'Login',
-    register: 'Register',
+    registerTitle: 'Join Garuda',
     signingIn: 'Signing in...',
     signingUp: 'Signing up...',
     loginSubtitle: 'Sign in to your account',
@@ -89,7 +87,6 @@ const translations = {
     // Dashboard
     activeBookings: 'Active Bookings',
     pastBookings: 'Past Bookings',
-    earnings: 'Earnings',
     pendingRequests: 'Pending Requests',
     
     // Trust badges
@@ -113,7 +110,6 @@ const translations = {
     unavailable: 'Unavailable',
     reviews: 'reviews',
     startingFrom: 'Starting from',
-    provider: 'Provider',
     route: 'Route',
     gettingLocation: 'Getting your location...',
     clickMapToMove: 'Click map to move pin',
@@ -134,7 +130,7 @@ const translations = {
     heroSubtitle_new: 'From leaky pipes to glowing skin — trusted professionals at your doorstep, every single time.',
     searchPlaceholder_new: 'What can we fix, clean, or create for you?',
     exploreServices: 'Explore Services →',
-    whyChooseUs: 'Why Thousands Trust SewaSathi',
+    whyChooseUs: 'Why Thousands Trust Garuda',
     howItWorksTitle: 'Three Steps to a Better Home',
     step1: 'Describe Your Need',
     step1Desc: 'Tell us what you need in plain language or snap a photo.',
@@ -159,7 +155,6 @@ const translations = {
     status: 'Status',
     viewDetails: 'View Details',
     providerDashboard: 'Service Provider Dashboard',
-    earnings: 'Earnings',
     completedServices: 'Completed Services',
     totalJobs: 'Total Jobs',
     completedJobs: 'Completed Jobs',
@@ -167,7 +162,6 @@ const translations = {
     averageRating: 'Average Rating',
     pendingBookingRequests: 'New Booking Requests',
     providerNotFound: 'Provider not found',
-    bookNow: 'Book Now',
     trustScore: 'Trust Score',
   },
   np: {
@@ -181,7 +175,7 @@ const translations = {
     logout: 'लगआउट',
     
     // Home
-    heroTitle: 'नेपालमा विश्वसनीय घरेलु सेवा बुक गर्नुहोस्',
+    heroTitle: 'नेपालभर भरपर्दो स्थानीय सेवा',
     heroSubtitle: 'तपाईंको ढोकामा व्यावसायिक सेवाहरू',
     searchPlaceholder: 'कुन सेवा चाहिन्छ?',
     bookNow: 'अहिले बुक गर्नुहोस्',
@@ -200,7 +194,7 @@ const translations = {
     mapView: 'नक्सा दृश्य',
     filterByCity: 'शहर अनुसार छान्नुहोस्',
     filterByCategory: 'श्रेणी अनुसार छान्नुहोस्',
-    showWomenFirst: 'महिला प्रदायक पहिले देखाउनुहोस् 💜',
+    showWomenFirst: 'महिला प्रदायक पहिले देखाउनुहोस्',
     noProviders: 'कुनै प्रदायक फेला परेन',
     
     // Booking
@@ -227,13 +221,11 @@ const translations = {
     name: 'पूरा नाम',
     phone: 'फोन नम्बर',
     loginTitle: 'स्वागत छ',
-    registerTitle: 'सेवासाथीमा सामेल हुनुहोस्',
-    login: 'लग इन',
-    register: 'दर्ता गर्नुहोस्',
+    registerTitle: 'गरुडा मा सामेल हुनुहोस्',
     signingIn: 'लग इन हो रहेको छ...',
     signingUp: 'साइन अप हो रहेको छ...',
-    loginSubtitle: 'आपको खाता वर्तमान राख्नुहोस्',
-    registerSubtitle: 'आपको खाता सिर्जना गर्नुहोस्',
+    loginSubtitle: 'खातामा प्रवेश गर्नुहोस्',
+    registerSubtitle: 'नयाँ खाता सिर्जना गर्नुहोस्',
     demoAccounts: 'डेमो खाता',
     customer: 'ग्राहक',
     provider: 'सेवा प्रदान गर्नेहरू',
@@ -258,7 +250,6 @@ const translations = {
     // Dashboard
     activeBookings: 'सक्रिय बुकिङहरू',
     pastBookings: 'पुराना बुकिङहरू',
-    earnings: 'आम्दानी',
     pendingRequests: 'पेन्डिङ अनुरोधहरू',
     
     // Trust badges
@@ -282,7 +273,6 @@ const translations = {
     unavailable: 'अनुपलब्ध',
     reviews: 'समीक्षाहरू',
     startingFrom: 'शुरु मूल्य',
-    provider: 'प्रदायक',
     route: 'मार्ग',
     gettingLocation: 'तपाईंको स्थान पत्ता लगाउँदै...',
     clickMapToMove: 'पिन सार्न नक्सामा क्लिक गर्नुहोस्',
@@ -303,7 +293,7 @@ const translations = {
     heroSubtitle_new: 'पाइपको समस्यादेखि सौन्दर्य सेवासम्म — भरपर्दा पेशेवरहरू तपाईंको ढोकामा।',
     searchPlaceholder_new: 'के मर्मत, सफाई वा सेवा चाहिन्छ?',
     exploreServices: 'सेवाहरू हेर्नुहोस् →',
-    whyChooseUs: 'किन हजारौं मान्छे सेवासाथीमा भरोसा गर्छन्',
+    whyChooseUs: 'किन हजारौं मान्छे गरुडा मा भरोसा गर्छन्',
     howItWorksTitle: 'राम्रो घरका तीन सजिला कदम',
     step1: 'आफ्नो आवश्यकता बताउनुहोस्',
     step1Desc: 'साधारण भाषामा वा फोटो खिचेर बताउनुहोस्।',
@@ -328,7 +318,6 @@ const translations = {
     status: 'स्थिति',
     viewDetails: 'विस्तृत विवरण देखुन्नुहोस्',
     providerDashboard: 'सेवा प्रदायक डैशबोर्ड',
-    earnings: 'आम्दानी',
     completedServices: 'पूरा भएका सेवाहरू',
     totalJobs: 'कुल कामहरू',
     completedJobs: 'पूरा भएका कामहरू',
@@ -336,7 +325,6 @@ const translations = {
     averageRating: 'औसत रेटिङ',
     pendingBookingRequests: 'नयाँ बुकिङ अनुरोधहरू',
     providerNotFound: 'सेवा प्रदायक नभेटिएको',
-    bookNow: 'अभी बुक गर्नुहोस्',
     trustScore: 'विश्वास स्कोर',
   }
 }

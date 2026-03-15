@@ -10,14 +10,14 @@ const ChatWithProvider = ({ booking, provider }) => {
         className="flex items-center gap-2 px-4 py-2 bg-green-500 
                    text-white rounded-lg text-sm font-medium hover:bg-green-600"
       >
-        💬 Chat
+        Chat
       </button>
       {showOptions && (
         <div className="absolute bottom-full left-0 mb-2 bg-white rounded-xl 
                         shadow-xl border border-gray-100 p-3 min-w-48 z-20">
           {/* WhatsApp */}
           <a
-            href={`https://wa.me/977${provider?.phone?.replace(/^0/, '')}?text=Hello ${provider?.name}! I have a booking with you (ID: #${booking.id}) on SewaSathi.`}
+            href={`https://wa.me/977${provider?.phone?.replace(/^0/, '')}?text=Hello ${provider?.name}! I have a booking with you (ID: #${booking.id}) on Garuda.`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg 
@@ -37,9 +37,9 @@ const ChatWithProvider = ({ booking, provider }) => {
           </a>
           {/* Email */}
           <a
-            href={`mailto:${provider?.email}?subject=Booking #${booking.id} on SewaSathi`}
+            href={`mailto:${provider?.email}?subject=Booking #${booking.id} on Garuda`}
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg 
-                       hover:bg-purple-50 text-purple-700 font-medium text-sm block w-full text-left"
+                       hover:bg-purple-300/20 text-purple-600 font-medium text-sm block w-full text-left"
           >
             <span className="text-xl">✉️</span>
             Email
@@ -53,9 +53,9 @@ const ChatWithProvider = ({ booking, provider }) => {
               }))
             }}
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg 
-                       hover:bg-purple-50 text-purple-700 font-medium text-sm w-full text-left"
+                       hover:bg-purple-300/20 text-purple-600 font-medium text-sm w-full text-left"
           >
-            <span className="text-xl">🤖</span>
+            <img src="/garuda.jpeg" alt="Garuda" className="w-5 h-5 rounded-full object-cover" />
             AI Assistant
           </button>
         </div>

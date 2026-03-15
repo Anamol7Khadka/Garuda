@@ -62,7 +62,7 @@ export default function CustomerDashboard() {
     switch(status) {
       case 'pending': return 'bg-yellow-100 text-yellow-700'
       case 'confirmed': return 'bg-blue-100 text-blue-700'
-      case 'in_progress': return 'bg-purple-100 text-purple-700'
+      case 'in_progress': return 'bg-purple-300 text-purple-600'
       case 'completed': return 'bg-green-100 text-green-700'
       default: return 'bg-gray-100 text-gray-700'
     }
@@ -89,14 +89,14 @@ export default function CustomerDashboard() {
                 {user?.name}
               </h1>
               {user?.is_female && (
-                <span className="bg-purple-100 text-purple-700 text-xs 
+                <span className="bg-purple-300 text-purple-600 text-xs 
                                  font-semibold px-2.5 py-1 rounded-full">
-                  💜 Women First
+                  Women First
                 </span>
               )}
             </div>
             <p className="text-gray-500 text-sm">{user?.email}</p>
-            <p className="text-gray-500 text-sm">📍 {user?.city || 'Kathmandu'}</p>
+            <p className="text-gray-500 text-sm">{user?.city || 'Kathmandu'}</p>
             <p className="text-xs text-gray-400 mt-2">
               Click the photo to upload a new one
             </p>
@@ -104,8 +104,8 @@ export default function CustomerDashboard() {
 
           {/* Stats */}
           <div className="hidden md:flex gap-6 text-center">
-            <div className="bg-purple-50 rounded-xl px-6 py-3">
-              <div className="text-2xl font-bold text-purple-700">
+            <div className="bg-purple-300/30 rounded-xl px-6 py-3">
+              <div className="text-2xl font-bold text-purple-600">
                 {bookings.filter(b => b.status === 'completed').length}
               </div>
               <div className="text-xs text-gray-500 mt-0.5">Completed</div>
@@ -126,7 +126,7 @@ export default function CustomerDashboard() {
             onClick={() => setActiveTab('active')}
             className={`px-6 py-2 rounded-lg font-semibold transition-colors ${
               activeTab === 'active' 
-                ? 'bg-primary-700 text-white' 
+                ? 'bg-purple-600 text-white' 
                 : 'bg-white border border-gray-300 text-gray-700'
             }`}
           >
@@ -136,7 +136,7 @@ export default function CustomerDashboard() {
             onClick={() => setActiveTab('completed')}
             className={`px-6 py-2 rounded-lg font-semibold transition-colors ${
               activeTab === 'completed' 
-                ? 'bg-primary-700 text-white' 
+                ? 'bg-purple-600 text-white' 
                 : 'bg-white border border-gray-300 text-gray-700'
             }`}
           >
@@ -147,7 +147,7 @@ export default function CustomerDashboard() {
         {/* Bookings */}
         {loading ? (
           <div className="text-center py-12">
-            <div className="inline-block w-12 h-12 border-4 border-primary-300 border-t-primary-700 rounded-full animate-spin"></div>
+            <div className="inline-block w-12 h-12 border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
           </div>
         ) : bookings.length > 0 ? (
           <div className="space-y-4">
@@ -165,7 +165,7 @@ export default function CustomerDashboard() {
 
                 <div className="grid md:grid-cols-4 gap-4 mb-4">
                   <div className="flex items-center gap-2">
-                    <Calendar className="text-primary-700" size={20} />
+                    <Calendar className="text-purple-600" size={20} />
                     <div>
                       <p className="text-sm text-gray-600">{t('date')}</p>
                       <p className="font-semibold">
@@ -174,21 +174,21 @@ export default function CustomerDashboard() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <MapPin className="text-primary-700" size={20} />
+                    <MapPin className="text-purple-600" size={20} />
                     <div>
                       <p className="text-sm text-gray-600">{t('location')}</p>
                       <p className="font-semibold">{booking.address?.substring(0, 20)}...</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <DollarSign className="text-primary-700" size={20} />
+                    <DollarSign className="text-purple-600" size={20} />
                     <div>
                       <p className="text-sm text-gray-600">{t('price')}</p>
                       <p className="font-semibold">₨{booking.final_price}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Star className="text-primary-700" size={20} />
+                    <Star className="text-purple-600" size={20} />
                     <div>
                       <p className="text-sm text-gray-600">{t('status')}</p>
                       <p className="font-semibold">{booking.payment_status}</p>
@@ -198,7 +198,7 @@ export default function CustomerDashboard() {
 
                 <div className="flex gap-3">
                   <ChatWithProvider booking={booking} provider={booking.provider_details} />
-                  <button className="px-6 py-2 bg-primary-700 text-white rounded-lg font-semibold hover:bg-primary-800 transition-colors">
+                  <button className="px-6 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-600/90 transition-colors">
                     {t('viewDetails')}
                   </button>
                 </div>
@@ -208,7 +208,7 @@ export default function CustomerDashboard() {
         ) : (
           <div className="bg-white rounded-lg shadow-md p-12 text-center">
             <p className="text-gray-600 text-lg mb-4">{t('noBookings')}</p>
-            <a href="/services" className="inline-block px-6 py-3 bg-primary-700 text-white rounded-lg font-semibold hover:bg-primary-800">
+            <a href="/services" className="inline-block px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-600/90">
               {t('bookService')}
             </a>
           </div>

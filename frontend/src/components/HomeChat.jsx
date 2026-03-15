@@ -2,29 +2,31 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import client from '../api/client'
 import { useLanguage } from '../context/LanguageContext'
+import { useAuth } from '../context/AuthContext'
 
 // SERVICE ROUTING MAP
 const SERVICE_ROUTES = {
-  plumbing: { path: '/services?category=plumbing', label: 'Plumbers', icon: '🔧', categoryId: 1 },
-  electrical: { path: '/services?category=electrical', label: 'Electricians', icon: '⚡', categoryId: 3 },
-  cleaning: { path: '/services?category=cleaning', label: 'Cleaners', icon: '🧹', categoryId: 2 },
-  beauty: { path: '/services?category=beauty', label: 'Beauty & Wellness', icon: '💆', categoryId: 4 },
-  carpentry: { path: '/services?category=carpentry', label: 'Carpenters', icon: '🪚', categoryId: 5 },
-  painting: { path: '/services?category=painting', label: 'Painters', icon: '🎨', categoryId: 6 },
-  ac_repair: { path: '/services?category=ac_repair', label: 'AC & Appliances', icon: '❄️', categoryId: 7 },
-  tutoring: { path: '/services?category=tutoring', label: 'Tutors', icon: '📚', categoryId: 8 },
-  pest_control: { path: '/services?category=pest_control', label: 'Pest Control', icon: '🐛', categoryId: 9 },
-  cooking: { path: '/services?category=cooking', label: 'Cooks', icon: '👨‍🍳', categoryId: 10 },
+  plumbing: { path: '/services?category=plumbing', label: 'Plumbers', categoryId: 1 },
+  electrical: { path: '/services?category=electrical', label: 'Electricians', categoryId: 3 },
+  cleaning: { path: '/services?category=cleaning', label: 'Cleaners', categoryId: 2 },
+  beauty: { path: '/services?category=beauty', label: 'Beauty & Wellness', categoryId: 4 },
+  carpentry: { path: '/services?category=carpentry', label: 'Carpenters', categoryId: 5 },
+  painting: { path: '/services?category=painting', label: 'Painters', categoryId: 6 },
+  ac_repair: { path: '/services?category=ac_repair', label: 'AC & Appliances', categoryId: 7 },
+  tutoring: { path: '/services?category=tutoring', label: 'Tutors', categoryId: 8 },
+  pest_control: { path: '/services?category=pest_control', label: 'Pest Control', categoryId: 9 },
+  cooking: { path: '/services?category=cooking', label: 'Cooks', categoryId: 10 },
 }
 
 const HomeChat = () => {
   const navigate = useNavigate()
   const { language } = useLanguage()
+  const { isAuthenticated } = useAuth()
   const [messages, setMessages] = useState([
     {
       id: 1,
       role: 'assistant',
-      text: "👋 Hi! I'm your SewaSathi assistant. Tell me what home service you need and I'll find the right professionals for you!",
+      text: "👋 Hi! I'm your Garuda assistant. Tell me what home service you need and I'll find the right professionals for you!",
       timestamp: new Date()
     }
   ])
@@ -91,53 +93,88 @@ const HomeChat = () => {
   }
 
   const QUICK_PROMPTS = [
-    '🔧 Pipe is leaking',
-    '⚡ No electricity',
-    '🧹 House cleaning',
-    '💆 Beauty service',
-    '🪚 Furniture repair',
-    '❄️ AC not cooling',
+    'Pipe is leaking',
+    'No electricity',
+    'House cleaning',
+    'Beauty service',
+    'Furniture repair',
+    'AC not cooling',
   ]
 
-  return (
-    <div className="bg-white rounded-3xl shadow-2xl border border-purple-100 
-                    overflow-hidden max-w-2xl mx-auto">
-      {/* Chat header */}
-      <div className="bg-gradient-to-r from-purple-700 to-purple-500 p-5">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center 
-                          justify-center text-2xl">
-            🤖
+  if (!isAuthenticated) {
+    return (
+      <div className="rounded-3xl border p-6 max-w-2xl mx-auto" style={{ borderColor: 'var(--c-border)', boxShadow: 'var(--shadow-soft)', backgroundColor: 'var(--c-surface)' }}>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-12 h-12 rounded-2xl overflow-hidden flex items-center justify-center" style={{ backgroundColor: 'var(--c-primary)', boxShadow: 'var(--shadow-soft)' }}>
+            <img src="/garuda.jpeg" alt="Garuda" className="w-full h-full object-cover" />
           </div>
           <div>
-            <h3 className="text-white font-bold text-lg">SewaSathi Assistant</h3>
+            <h3 className="font-bold text-lg" style={{ color: 'var(--t-primary)' }}>Garuda Assistant</h3>
+            <p className="text-sm" style={{ color: 'var(--t-secondary)' }}>Sign in to chat with our AI helper</p>
+          </div>
+        </div>
+        <div className="flex gap-3 flex-wrap">
+          <button
+            onClick={() => navigate('/login')}
+            className="px-4 py-2 rounded-lg font-semibold"
+            style={{ backgroundColor: 'var(--c-primary)', color: '#fff', boxShadow: 'var(--shadow-soft)' }}
+          >
+            Login to chat
+          </button>
+          <button
+            onClick={() => navigate('/register')}
+            className="px-4 py-2 rounded-lg font-semibold border"
+            style={{ borderColor: 'var(--c-border)', color: 'var(--t-primary)' }}
+          >
+            Create account
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="rounded-3xl overflow-hidden max-w-2xl mx-auto border" style={{ borderColor: 'var(--c-border)', boxShadow: 'var(--shadow-strong)', backgroundColor: 'var(--c-surface)' }}>
+      {/* Chat header */}
+      <div className="p-5" style={{ background: 'linear-gradient(135deg, var(--c-primary), var(--c-accent))' }}>
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-white/20 rounded-2xl overflow-hidden flex items-center justify-center">
+            <img src="/garuda.jpeg" alt="Garuda" className="w-full h-full object-cover" />
+          </div>
+          <div>
+            <h3 className="text-white font-bold text-lg">Garuda Assistant</h3>
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"/>
-              <span className="text-purple-200 text-sm">Online — Ask me anything</span>
+              <span className="text-white/80 text-sm">Online — Ask me anything</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Messages */}
-      <div className="h-80 overflow-y-auto p-4 space-y-3 bg-gray-50">
+      <div className="h-80 overflow-y-auto p-4 space-y-3" style={{ backgroundColor: 'var(--c-muted)' }}>
         {messages.map((msg) => (
           <div
             key={msg.id}
             className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {msg.role === 'assistant' && (
-              <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center 
-                              justify-center text-sm mr-2 flex-shrink-0 mt-1">
-                🤖
+              <div className="w-8 h-8 rounded-full overflow-hidden mr-2 flex-shrink-0 mt-1"
+                   style={{ backgroundColor: 'var(--c-accent)', boxShadow: 'var(--shadow-soft)' }}>
+                <img src="/garuda.jpeg" alt="Garuda" className="w-full h-full object-cover" />
               </div>
             )}
             <div
               className={`max-w-xs lg:max-w-sm px-4 py-3 rounded-2xl text-sm leading-relaxed ${
                 msg.role === 'user'
-                  ? 'bg-purple-600 text-white rounded-br-none'
-                  : 'bg-white text-gray-800 shadow-sm rounded-bl-none border border-gray-100'
+                  ? 'text-white rounded-br-none'
+                  : 'bg-white text-[var(--t-primary)] shadow-sm rounded-bl-none border'
               }`}
+              style={
+                msg.role === 'user'
+                  ? { backgroundColor: 'var(--c-primary)' }
+                  : { borderColor: 'var(--c-border)', boxShadow: 'var(--shadow-soft)' }
+              }
             >
               {msg.text}
             </div>
@@ -147,16 +184,16 @@ const HomeChat = () => {
         {/* Typing indicator */}
         {loading && (
           <div className="flex justify-start">
-            <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center 
-                            justify-center text-sm mr-2">🤖</div>
-            <div className="bg-white rounded-2xl rounded-bl-none px-4 py-3 
-                            shadow-sm border border-gray-100">
+            <div className="w-8 h-8 rounded-full overflow-hidden mr-2"
+              style={{ backgroundColor: 'var(--c-accent)', boxShadow: 'var(--shadow-soft)' }}>
+              <img src="/garuda.jpeg" alt="Garuda" className="w-full h-full object-cover" />
+            </div>
+            <div className="bg-white rounded-2xl rounded-bl-none px-4 py-3 shadow-sm border"
+              style={{ borderColor: 'var(--c-border)' }}>
               <div className="flex gap-1">
-                <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"/>
-                <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" 
-                     style={{animationDelay: '0.1s'}}/>
-                <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"
-                     style={{animationDelay: '0.2s'}}/>
+             <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--c-primary)' }}/>
+             <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--c-primary)', animationDelay: '0.1s' }}/>
+             <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--c-primary)', animationDelay: '0.2s' }}/>
               </div>
             </div>
           </div>
@@ -165,22 +202,24 @@ const HomeChat = () => {
         {/* Route suggestion card */}
         {routeSuggestion && (
           <div className="flex justify-start">
-            <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center 
-                            justify-center text-sm mr-2 flex-shrink-0">🤖</div>
-            <div className="bg-purple-50 border-2 border-purple-200 rounded-2xl 
-                            rounded-bl-none p-3 max-w-xs">
-              <p className="text-sm text-gray-700 mb-2 font-medium">
+              <div className="w-8 h-8 rounded-full overflow-hidden mr-2 flex-shrink-0"
+                style={{ backgroundColor: 'var(--c-accent)', boxShadow: 'var(--shadow-soft)' }}>
+                <img src="/garuda.jpeg" alt="Garuda" className="w-full h-full object-cover" />
+              </div>
+            <div className="rounded-2xl rounded-bl-none p-3 max-w-xs border"
+                 style={{ backgroundColor: 'var(--c-muted)', borderColor: 'var(--c-accent)' }}>
+              <p className="text-sm mb-2 font-medium" style={{ color: 'var(--t-primary)' }}>
                 I found the right professionals for you:
               </p>
               <button
                 onClick={() => handleRoute(routeSuggestion)}
-                className="w-full flex items-center gap-3 bg-purple-600 hover:bg-purple-700 
-                           text-white rounded-xl px-4 py-3 transition-all font-semibold text-sm"
+                className="w-full flex items-center gap-3 rounded-xl px-4 py-3 transition-all font-semibold text-sm text-white"
+                style={{ backgroundColor: 'var(--c-primary)', boxShadow: 'var(--shadow-soft)' }}
               >
                 <span className="text-xl">{routeSuggestion.icon}</span>
                 <div className="text-left">
                   <div>View {routeSuggestion.label}</div>
-                  <div className="text-purple-200 text-xs font-normal">
+                  <div className="text-white/80 text-xs font-normal">
                     {routeSuggestion.urgency === 'high' ? '🔴 Urgent' : '✅ Available now'}
                   </div>
                 </div>
@@ -194,14 +233,17 @@ const HomeChat = () => {
       </div>
 
       {/* Quick prompts */}
-      <div className="px-4 pt-3 pb-2 flex gap-2 overflow-x-auto scrollbar-hide bg-white">
+      <div className="px-4 pt-3 pb-2 flex gap-2 overflow-x-auto scrollbar-hide bg-white" style={{ borderTop: '1px solid var(--c-border)' }}>
         {QUICK_PROMPTS.map((prompt) => (
           <button
             key={prompt}
             onClick={() => sendMessage(prompt.replace(/^[^\s]+\s/, ''))}
-            className="flex-shrink-0 text-xs bg-purple-50 hover:bg-purple-100 
-                       text-purple-700 px-3 py-1.5 rounded-full border border-purple-200 
-                       transition-all font-medium whitespace-nowrap"
+            className="flex-shrink-0 text-xs px-3 py-1.5 rounded-full border transition-all font-medium whitespace-nowrap"
+            style={{
+              backgroundColor: 'var(--c-muted)',
+              color: 'var(--c-primary)',
+              borderColor: 'var(--c-accent)'
+            }}
           >
             {prompt}
           </button>
@@ -209,7 +251,7 @@ const HomeChat = () => {
       </div>
 
       {/* Input */}
-      <div className="p-4 bg-white border-t border-gray-100">
+      <div className="p-4 bg-white border-t" style={{ borderColor: 'var(--c-border)' }}>
         <div className="flex gap-2">
           <input
             type="text"
@@ -217,16 +259,15 @@ const HomeChat = () => {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && sendMessage(input)}
             placeholder="Describe your problem... (e.g. 'my pipe is leaking')"
-            className="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm 
-                       focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-50"
+            className="flex-1 border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 bg-gray-50"
+            style={{ borderColor: 'var(--c-border)', '--tw-ring-color': 'var(--c-primary)' }}
             disabled={loading}
           />
           <button
             onClick={() => sendMessage(input)}
             disabled={!input.trim() || loading}
-            className="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-300 
-                       text-white rounded-xl px-5 py-3 font-semibold text-sm 
-                       transition-all flex items-center gap-2"
+            className="text-white rounded-xl px-5 py-3 font-semibold text-sm transition-all flex items-center gap-2"
+            style={{ backgroundColor: 'var(--c-primary)', boxShadow: 'var(--shadow-soft)' }}
           >
             {loading ? (
               <div className="w-4 h-4 border-2 border-white border-t-transparent 

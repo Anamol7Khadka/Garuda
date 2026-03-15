@@ -49,8 +49,8 @@ export default function ProviderProfile() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
-          <div className="h-48 bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
-            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg">
+          <div className="h-48 flex items-center justify-center" style={{ background: 'linear-gradient(145deg, var(--c-bg), #ffffff)' }}>
+            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg" style={{ boxShadow: 'var(--shadow-soft)' }}>
               {provider.profile_photo ? (
                 <img
                   src={provider.profile_photo}
@@ -63,8 +63,7 @@ export default function ProviderProfile() {
                 />
               ) : null}
               <div
-                className="w-full h-full bg-gradient-to-br from-purple-400 to-purple-600 
-                           items-center justify-center font-bold text-white text-3xl"
+                className="w-full h-full provider-avatar-fallback items-center justify-center font-bold text-3xl"
                 style={{ display: provider.profile_photo ? 'none' : 'flex' }}
               >
                 {getInitials(provider.name)}
@@ -78,13 +77,13 @@ export default function ProviderProfile() {
                 <h1 className="text-4xl font-bold text-gray-800 mb-2">{user.name}</h1>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1">
-                    <MapPin size={20} className="text-primary-700" />
+                    <MapPin size={20} className="text-[var(--t-secondary)]" />
                     <span className="text-gray-600">{user.city}</span>
                   </div>
-                  {user.is_female && <span className="women-first-badge">💜 {t('womenFirst')}</span>}
+                  {user.is_female && <span className="women-first-badge">{t('womenFirst')}</span>}
                 </div>
               </div>
-              <button className="px-6 py-3 bg-primary-700 text-white rounded-lg font-semibold hover:bg-primary-800">
+                <button className="px-6 py-3 rounded-lg font-semibold text-white" style={{ backgroundColor: 'var(--c-primary)', boxShadow: 'var(--shadow-soft)' }}>
                 {t('bookNow')}
               </button>
             </div>
@@ -92,7 +91,7 @@ export default function ProviderProfile() {
             {/* Stats */}
             <div className="grid grid-cols-4 gap-4 border-t pt-6">
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary-700">{provider.provider?.rating}</div>
+                <div className="text-3xl font-bold" style={{ color: 'var(--c-primary)' }}>{provider.provider?.rating}</div>
                 <div className="flex justify-center gap-1 mt-1">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} size={16} className={i < Math.floor(provider.provider?.rating) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'} />
@@ -100,11 +99,11 @@ export default function ProviderProfile() {
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary-700">{provider.provider?.total_jobs}</div>
+                <div className="text-3xl font-bold" style={{ color: 'var(--c-primary)' }}>{provider.provider?.total_jobs}</div>
                 <p className="text-gray-600 text-sm">{t('totalJobs')}</p>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary-700">{provider.provider?.trust_score}</div>
+                <div className="text-3xl font-bold" style={{ color: 'var(--c-primary)' }}>{provider.provider?.trust_score}</div>
                 <p className="text-gray-600 text-sm">{t('trustScore')}</p>
               </div>
               <div className="text-center">
@@ -129,7 +128,7 @@ export default function ProviderProfile() {
 
         {/* Review Summary */}
         {provider.provider?.review_summary && (
-          <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg shadow-md p-6 mb-8 border-l-4 border-primary-700">
+          <div className="rounded-lg shadow-md p-6 mb-8 border-l-4" style={{ backgroundColor: 'var(--c-muted)', borderColor: 'var(--c-primary)' }}>
             <h2 className="text-2xl font-bold mb-3 text-gray-800">समीक्षा सारांश</h2>
             <p className="text-gray-700 italic">{provider.provider.review_summary}</p>
           </div>
@@ -141,10 +140,10 @@ export default function ProviderProfile() {
             <h2 className="text-2xl font-bold mb-4">सेवाहरू</h2>
             <div className="grid md:grid-cols-2 gap-4">
               {provider.services.map((service) => (
-                <div key={service.id} className="border border-gray-200 rounded-lg p-4">
+                <div key={service.id} className="border border-purple-300 rounded-lg p-4 hover:border-purple-600 transition-colors">
                   <h3 className="font-bold mb-2">{service.title}</h3>
                   <p className="text-gray-600 text-sm mb-3">{service.description}</p>
-                  <p className="text-primary-700 font-semibold">₨{service.price}</p>
+                  <p className="text-purple-600 font-semibold">₨{service.price}</p>
                 </div>
               ))}
             </div>

@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { useLanguage } from '../context/LanguageContext'
 import client from '../api/client'
 import LocationStep from '../components/LocationStep'
+import DynamicCostCalculator from '../components/DynamicCostCalculator'
 
 export default function BookingFlow() {
   const { t } = useLanguage()
@@ -14,6 +15,9 @@ export default function BookingFlow() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [confirmedBooking, setConfirmedBooking] = useState(null)
+  const [provider, setProvider] = useState(null)
+  const [serviceCategory, setServiceCategory] = useState('')
+  const [calculatedCost, setCalculatedCost] = useState(null)
 
   const [bookingData, setBookingData] = useState({
     address: '',
@@ -23,6 +27,27 @@ export default function BookingFlow() {
     scheduledDate: '',
     scheduledTime: ''
   })
+
+  // Fetch provider data
+  useEffect(() => {
+    if (providerId) {
+      const fetchProvider = async () => {
+        try {
+          const response = await client.get(`/api/providers/${providerId}`)
+          const providerData = response.data?.data || response.data
+          setProvider(providerData)
+          
+          // Try to extract service category from first service
+          if (providerData.services && providerData.services.length > 0) {
+            setServiceCategory(providerData.services[0].category?.title || 'Service')
+          }
+        } catch (err) {
+          console.error('Failed to fetch provider:', err)
+        }
+      }
+      fetchProvider()
+    }
+  }, [providerId])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -37,7 +62,8 @@ export default function BookingFlow() {
         latitude: bookingData.lat || undefined,
         longitude: bookingData.lng || undefined,
         scheduled_at: `${bookingData.scheduledDate}T${bookingData.scheduledTime}:00`,
-        status: 'pending'
+        status: 'pending',
+        final_price: calculatedCost || undefined  // Include calculated cost
       }
 
       // Remove undefined keys
@@ -75,24 +101,24 @@ export default function BookingFlow() {
           {/* Provider contact card */}
           {confirmedBooking?.provider && (
             <div className="bg-white rounded-2xl shadow-lg p-6 text-left mb-6 
-                            border border-purple-100">
+                            border border-purple-300">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 rounded-full bg-purple-100 
-                                flex items-center justify-center text-2xl">
-                  {confirmedBooking.provider.is_female ? '💜' : '👤'}
+                <div className="w-16 h-16 rounded-full bg-purple-300 
+                                flex items-center justify-center text-2xl font-bold text-purple-600">
+                  {confirmedBooking.provider.is_female ? 'F' : 'M'}
                 </div>
                 <div>
                   <h3 className="font-bold text-gray-900 text-lg">
                     {confirmedBooking.provider.name}
                   </h3>
                   {confirmedBooking.provider.is_female && (
-                    <span className="text-xs bg-purple-100 text-purple-700 
+                    <span className="text-xs bg-purple-300 text-purple-600 
                                    px-2 py-0.5 rounded-full font-medium">
-                      💜 Women First Provider
+                      Women First Provider
                     </span>
                   )}
                   <p className="text-sm text-gray-500 mt-0.5">
-                    📍 {confirmedBooking.provider.city}
+                    {confirmedBooking.provider.city}
                   </p>
                 </div>
               </div>
@@ -104,7 +130,7 @@ export default function BookingFlow() {
                   <div>
                     <p className="text-xs text-gray-500">Phone</p>
                     <a href={`tel:${confirmedBooking.provider.phone}`}
-                       className="font-semibold text-purple-700 hover:underline">
+                       className="font-semibold text-purple-600 hover:underline">
                       {confirmedBooking.provider.phone || 'Will be shared soon'}
                     </a>
                   </div>
@@ -115,7 +141,7 @@ export default function BookingFlow() {
                   <div>
                     <p className="text-xs text-gray-500">Email</p>
                     <a href={`mailto:${confirmedBooking.provider.email}`}
-                       className="font-semibold text-purple-700 hover:underline">
+                       className="font-semibold text-purple-600 hover:underline">
                       {confirmedBooking.provider.email}
                     </a>
                   </div>
@@ -124,7 +150,7 @@ export default function BookingFlow() {
                 {/* WhatsApp button */}
                 {confirmedBooking.provider.phone && (
                   <a
-                    href={`https://wa.me/977${confirmedBooking.provider.phone.replace(/^0/, '')}?text=Hello ${confirmedBooking.provider.name}, I just booked your service on SewaSathi. Booking ID: ${confirmedBooking.booking?.id || confirmedBooking.id}`}
+                    href={`https://wa.me/977${confirmedBooking.provider.phone.replace(/^0/, '')}?text=Hello ${confirmedBooking.provider.name}, I just booked your service on Garuda. Booking ID: ${confirmedBooking.booking?.id || confirmedBooking.id}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 w-full py-3 
@@ -151,7 +177,7 @@ export default function BookingFlow() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Amount</span>
-                  <span className="font-semibold text-purple-700">
+                  <span className="font-semibold text-purple-600">
                     Rs. {confirmedBooking.booking?.final_price || confirmedBooking.final_price || 'To be determined'}
                   </span>
                 </div>
@@ -168,7 +194,7 @@ export default function BookingFlow() {
           <div className="flex gap-3">
             <Link to="/dashboard/customer"
               className="flex-1 py-3 bg-purple-600 text-white rounded-xl 
-                         font-semibold hover:bg-purple-700 text-center">
+                         font-semibold hover:bg-purple-600/90 text-center">
               View My Bookings
             </Link>
             <Link to="/"
@@ -224,12 +250,28 @@ export default function BookingFlow() {
                 placeholder="Tell us what service you need..."
                 rows="4"
                 className="w-full border border-gray-200 rounded-xl px-4 py-3 
-                           text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                           text-sm focus:outline-none focus:ring-2 focus:ring-purple-600"
                 required
               />
             </div>
 
-            {/* Step 3: Date & Time */}
+            {/* Cost Calculator - Shows only when location and description are entered */}
+            {bookingData.lat && bookingData.lng && bookingData.description?.trim() && provider && (
+              <div className="relative">
+                <DynamicCostCalculator
+                  serviceCategory={serviceCategory}
+                  description={bookingData.description}
+                  providerRating={provider.rating || 0}
+                  providerExperience={provider.total_jobs || 0}
+                  latitude={provider.latitude}
+                  longitude={provider.longitude}
+                  customerLat={bookingData.lat}
+                  customerLng={bookingData.lng}
+                  isVisible={true}
+                  onCostUpdate={(cost) => setCalculatedCost(cost)}
+                />
+              </div>
+            )}
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-4">
                 <label className="block text-sm font-medium text-gray-700">
@@ -240,7 +282,7 @@ export default function BookingFlow() {
                   value={bookingData.scheduledDate || ''}
                   onChange={(e) => setBookingData({...bookingData, scheduledDate: e.target.value})}
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 
-                             text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                             text-sm focus:outline-none focus:ring-2 focus:ring-purple-600"
                   required
                 />
               </div>
@@ -253,7 +295,7 @@ export default function BookingFlow() {
                   value={bookingData.scheduledTime || ''}
                   onChange={(e) => setBookingData({...bookingData, scheduledTime: e.target.value})}
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 
-                             text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                             text-sm focus:outline-none focus:ring-2 focus:ring-purple-600"
                   required
                 />
               </div>
@@ -264,7 +306,7 @@ export default function BookingFlow() {
               type="submit"
               disabled={loading}
               className="w-full mt-8 bg-purple-600 text-white font-semibold py-3 rounded-xl 
-                         hover:bg-purple-700 transition-colors disabled:opacity-50"
+                         hover:bg-purple-600/90 transition-colors disabled:opacity-50"
             >
               {loading ? 'Booking...' : t('confirmBooking')}
             </button>

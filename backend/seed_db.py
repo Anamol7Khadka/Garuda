@@ -11,8 +11,8 @@ import random
 app = create_app('development')
 
 def get_avatar(name, is_female=False):
-    """Generate avatar URL from UI Avatars API"""
-    bg = 'C084FC' if is_female else '6366F1'  # purple for women, indigo for men
+    """Generate avatar URL from UI Avatars API with brand colors (no purple)."""
+    bg = 'C0392B' if is_female else 'A05A2C'  # brand primary / warm brown
     color = 'ffffff'
     name_encoded = name.replace(' ', '+')
     return f"https://ui-avatars.com/api/?name={name_encoded}&background={bg}&color={color}&size=200&bold=true&rounded=true"

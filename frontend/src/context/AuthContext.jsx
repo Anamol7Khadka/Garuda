@@ -75,15 +75,19 @@ export const AuthProvider = ({ children }) => {
     return data
   }
 
-  const register = async (name, email, password, role = 'customer', gender = null, city = null) => {
-    const res = await client.post('/api/auth/register', {
+  const register = async (name, email, password, role = 'customer', gender = null, city = null, skills = null) => {
+    const payload = {
       name,
       email,
       password,
       role,
       gender,
       city
-    })
+    }
+    if (skills && skills.length > 0) {
+      payload.skills = skills
+    }
+    const res = await client.post('/api/auth/register', payload)
     const data = res.data?.data || res.data
     localStorage.setItem('access_token', data.access_token)
     localStorage.setItem('refresh_token', data.refresh_token)

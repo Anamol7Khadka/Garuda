@@ -71,8 +71,8 @@ export default function PhotoUpload({
       <div
         onClick={handleClick}
         className={`${sizeClasses[size]} rounded-full overflow-hidden 
-                   border-4 border-purple-200 shadow-lg cursor-pointer 
-                   relative group flex-shrink-0`}
+             shadow-lg cursor-pointer relative group flex-shrink-0`}
+        style={{ border: '4px solid var(--c-primary)', boxShadow: 'var(--shadow-soft)' }}
       >
         {preview ? (
           <img
@@ -82,9 +82,10 @@ export default function PhotoUpload({
             onError={() => setPreview(null)}
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-purple-400 
-                          to-purple-600 flex items-center justify-center 
-                          font-bold text-white">
+          <div className="w-full h-full flex items-center justify-center font-bold text-white"
+               style={{
+                 background: 'linear-gradient(135deg, #f5d7cc 0%, #c0392b 100%)'
+               }}>
             {getInitials()}
           </div>
         )}

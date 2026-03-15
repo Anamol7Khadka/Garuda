@@ -1,30 +1,32 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { MessageCircle, Send, X, Minimize2, Maximize2 } from 'lucide-react'
+import { Send, X, Minimize2, Maximize2, LogIn } from 'lucide-react'
 import api from '../api/client'
+import { useAuth } from '../context/AuthContext'
 
 // SERVICE ROUTING MAP
 const SERVICE_ROUTES = {
-  plumbing: { path: '/services?category=plumbing', label: 'Plumbers', icon: '🔧', categoryId: 1 },
-  electrical: { path: '/services?category=electrical', label: 'Electricians', icon: '⚡', categoryId: 3 },
-  cleaning: { path: '/services?category=cleaning', label: 'Cleaners', icon: '🧹', categoryId: 2 },
-  beauty: { path: '/services?category=beauty', label: 'Beauty & Wellness', icon: '💆', categoryId: 4 },
-  carpentry: { path: '/services?category=carpentry', label: 'Carpenters', icon: '🪚', categoryId: 5 },
-  painting: { path: '/services?category=painting', label: 'Painters', icon: '🎨', categoryId: 6 },
-  ac_repair: { path: '/services?category=ac_repair', label: 'AC & Appliances', icon: '❄️', categoryId: 7 },
-  tutoring: { path: '/services?category=tutoring', label: 'Tutors', icon: '📚', categoryId: 8 },
-  pest_control: { path: '/services?category=pest_control', label: 'Pest Control', icon: '🐛', categoryId: 9 },
-  cooking: { path: '/services?category=cooking', label: 'Cooks', icon: '👨‍🍳', categoryId: 10 },
+  plumbing: { path: '/services?category=plumbing', label: 'Plumbers', categoryId: 1 },
+  electrical: { path: '/services?category=electrical', label: 'Electricians', categoryId: 3 },
+  cleaning: { path: '/services?category=cleaning', label: 'Cleaners', categoryId: 2 },
+  beauty: { path: '/services?category=beauty', label: 'Beauty & Wellness', categoryId: 4 },
+  carpentry: { path: '/services?category=carpentry', label: 'Carpenters', categoryId: 5 },
+  painting: { path: '/services?category=painting', label: 'Painters', categoryId: 6 },
+  ac_repair: { path: '/services?category=ac_repair', label: 'AC & Appliances', categoryId: 7 },
+  tutoring: { path: '/services?category=tutoring', label: 'Tutors', categoryId: 8 },
+  pest_control: { path: '/services?category=pest_control', label: 'Pest Control', categoryId: 9 },
+  cooking: { path: '/services?category=cooking', label: 'Cooks', categoryId: 10 },
 }
 
 export default function ChatBot() {
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
   const [isMinimized, setIsMinimized] = useState(false)
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "नमस्ते! 👋 मेरो नाम SewaSathi हो। मलाई तपाईंलाई घर सेवा बुकिङ गर्न मद्द गर्न खुसी छु। के तपाई कस्तो काम चाहिनुहुन्छ?",
+      text: "नमस्ते! मेरो नाम Garuda हो। मलाई तपाईंलाई घर सेवा बुकिङ गर्न मद्द गर्न खुसी छु। के तपाई कस्तो काम चाहिनुहुन्छ?",
       sender: 'bot',
       timestamp: new Date()
     }
@@ -102,35 +104,62 @@ export default function ChatBot() {
     }
   }
 
+  // Only allow authenticated users to use chatbot
+  if (!isAuthenticated) {
+    return (
+      <button
+        onClick={() => navigate('/login')}
+        className="fixed bottom-6 right-6 px-4 h-12 rounded-full text-sm font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2 z-40"
+        style={{
+          backgroundColor: 'var(--c-primary)',
+          color: '#fff',
+          boxShadow: 'var(--shadow-strong)',
+        }}
+      >
+        <LogIn size={18} />
+        Sign in to chat
+      </button>
+    )
+  }
+
   if (!isOpen) {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-center z-40 animate-bounce"
+        className="fixed bottom-6 right-6 w-16 h-16 rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center z-40 animate-bounce overflow-hidden"
+        style={{
+          background: '#fff',
+          boxShadow: 'var(--shadow-strong)',
+          border: '2px solid var(--c-primary)'
+        }}
       >
-        <MessageCircle size={28} />
+        <img src="/garuda.jpeg" alt="Garuda" className="w-full h-full object-cover" />
       </button>
     )
   }
 
   return (
-    <div className="fixed bottom-4 right-4 w-96 h-screen md:h-[600px] bg-white rounded-lg shadow-2xl flex flex-col z-40 border border-gray-200">
+    <div className="fixed bottom-4 right-4 w-96 h-screen md:h-[600px] bg-white rounded-lg shadow-2xl flex flex-col z-40 border"
+         style={{ borderColor: 'var(--c-border)', boxShadow: 'var(--shadow-strong)' }}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-4 rounded-t-lg flex justify-between items-center">
+      <div
+        className="text-white p-4 rounded-t-lg flex justify-between items-center"
+        style={{ background: 'linear-gradient(135deg, var(--c-primary), var(--c-accent))' }}
+      >
         <div>
-          <h3 className="font-bold text-lg">SewaSathi सहायक</h3>
-          <p className="text-sm text-primary-100">सवै समयमा उपलब्ध</p>
+          <h3 className="font-bold text-lg">Garuda सहायक</h3>
+          <p className="text-sm text-white/80">सवै समयमा उपलब्ध</p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={() => setIsMinimized(!isMinimized)}
-            className="p-1 hover:bg-primary-800 rounded"
+            className="p-1 hover:bg-white/10 rounded"
           >
             {isMinimized ? <Maximize2 size={20} /> : <Minimize2 size={20} />}
           </button>
           <button
             onClick={() => setIsOpen(false)}
-            className="p-1 hover:bg-primary-800 rounded"
+            className="p-1 hover:bg-white/10 rounded"
           >
             <X size={20} />
           </button>
@@ -140,7 +169,7 @@ export default function ChatBot() {
       {!isMinimized && (
         <>
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ backgroundColor: 'var(--c-muted)' }}>
             {messages.map((msg) => (
               <div key={msg.id}>
                 <div
@@ -149,9 +178,14 @@ export default function ChatBot() {
                   <div
                     className={`max-w-xs px-4 py-2 rounded-lg ${
                       msg.sender === 'user'
-                        ? 'bg-primary-600 text-white rounded-br-none'
-                        : 'bg-white text-gray-800 border border-gray-200 rounded-bl-none'
+                        ? 'text-white rounded-br-none'
+                        : 'bg-white text-[var(--t-primary)] border rounded-bl-none'
                     }`}
+                    style={
+                      msg.sender === 'user'
+                        ? { backgroundColor: 'var(--c-primary)' }
+                        : { borderColor: 'var(--c-border)', boxShadow: 'var(--shadow-soft)' }
+                    }
                   >
                     <p className="text-sm">{msg.text}</p>
                     <p className="text-xs mt-1 opacity-70">
@@ -168,8 +202,8 @@ export default function ChatBot() {
                   <div className="flex justify-start mt-2">
                     <button
                       onClick={() => navigate(SERVICE_ROUTES[msg.route.service].path)}
-                      className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white 
-                                text-xs px-3 py-2 rounded-lg w-max transition-all"
+                      className="flex items-center gap-2 text-white text-xs px-3 py-2 rounded-lg w-max transition-all"
+                      style={{ backgroundColor: 'var(--c-primary)', boxShadow: 'var(--shadow-soft)' }}
                     >
                       {SERVICE_ROUTES[msg.route.service].icon}
                       View {SERVICE_ROUTES[msg.route.service].label} →
@@ -180,11 +214,11 @@ export default function ChatBot() {
             ))}
             {loading && (
               <div className="flex justify-start">
-                <div className="bg-white text-gray-800 border border-gray-200 px-4 py-2 rounded-lg rounded-bl-none">
+                <div className="bg-white text-[var(--t-primary)] border px-4 py-2 rounded-lg rounded-bl-none" style={{ borderColor: 'var(--c-border)' }}>
                   <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--c-primary)' }}></div>
+                    <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--c-primary)', animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--c-primary)', animationDelay: '0.2s' }}></div>
                   </div>
                 </div>
               </div>
@@ -193,20 +227,22 @@ export default function ChatBot() {
           </div>
 
           {/* Input */}
-          <div className="border-t border-gray-200 p-4 bg-white rounded-b-lg flex gap-2">
+          <div className="border-t p-4 bg-white rounded-b-lg flex gap-2" style={{ borderColor: 'var(--c-border)' }}>
             <input
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
               placeholder="सन्देश लेख्नुहोस्..."
-              className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+              className="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 text-sm"
+              style={{ borderColor: 'var(--c-border)', boxShadow: 'var(--shadow-soft)' , '--tw-ring-color': 'var(--c-primary)' }}
               disabled={loading}
             />
             <button
               onClick={handleSendMessage}
               disabled={loading || !inputValue.trim()}
-              className="bg-primary-600 text-white p-2 rounded-lg hover:bg-primary-700 disabled:opacity-50 transition-colors"
+              className="text-white p-2 rounded-lg disabled:opacity-50 transition-colors"
+              style={{ backgroundColor: 'var(--c-primary)', boxShadow: 'var(--shadow-soft)' }}
             >
               <Send size={20} />
             </button>

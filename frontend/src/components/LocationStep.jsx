@@ -79,7 +79,7 @@ const LocationStep = ({ onLocationSelect }) => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 text-sm text-purple-700 bg-purple-50 
+      <div className="flex items-center gap-2 text-sm text-purple-600 bg-purple-300/20 
                       px-4 py-2 rounded-lg">
         <span>📍</span>
         <span>{detecting ? 'Detecting your location...' : 'Click map or drag pin to change location'}</span>
@@ -104,7 +104,7 @@ const LocationStep = ({ onLocationSelect }) => {
           }}
           placeholder="Your address..."
           className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm 
-                     focus:outline-none focus:ring-2 focus:ring-purple-500"
+                     focus:outline-none focus:ring-2 focus:ring-purple-600"
         />
         <p className="text-xs text-gray-400 mt-1">
           You can also type your address manually

@@ -3,8 +3,8 @@ import React from 'react'
 export default function ServiceCard({ service, provider }) {
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow provider-card-hover">
-      <div className="h-40 bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
-        <span className="text-5xl">🔧</span>
+      <div className="h-40 bg-gradient-to-br from-purple-300 to-slate-200 flex items-center justify-center">
+        <div className="text-5xl font-bold text-purple-600">★</div>
       </div>
       
       <div className="p-4">
@@ -12,7 +12,7 @@ export default function ServiceCard({ service, provider }) {
         <p className="text-gray-600 text-sm mb-3">{service?.description?.substring(0, 80)}...</p>
         
         <div className="flex justify-between items-center mb-3">
-          <span className="text-primary-700 font-semibold">₨{service?.price}</span>
+          <span className="text-purple-600 font-semibold">₨{service?.price}</span>
           <span className="text-gray-500 text-sm">({service?.price_type})</span>
         </div>
         
@@ -22,7 +22,7 @@ export default function ServiceCard({ service, provider }) {
           </div>
         )}
         
-        <button className="w-full px-4 py-2 bg-primary-700 text-white rounded-lg font-semibold hover:bg-primary-800 transition-colors">
+        <button className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-600/90 transition-colors">
           Book Service
         </button>
       </div>

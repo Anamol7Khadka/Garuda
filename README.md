@@ -57,6 +57,44 @@
 
 ---
 
+## 🤖 AI Architecture (LLM + RAG + Routing)
+
+- **LLM Backbone**: Groq-hosted `llama-3.3-70b-versatile` for fast text generation; Anthropic Claude (`claude-sonnet-4-20250514`) as fallback.
+- **RAG (Retrieval-Augmented Generation)**: We ground LLM replies on provider and booking data to reduce hallucinations and localize answers.
+- **Vector Database**: PostgreSQL table `provider_embeddings` stores dense vectors; similarity search powers semantic recall.
+- **Semantic Search**: User text → embedding → cosine similarity over stored vectors → top-k providers feed the response.
+- **Service Intent Detection**: Lightweight keyword scorer + LLM route extraction (`ROUTE_TO` JSON) to decide which service category to open in the UI.
+- **Response Parsing**: Backend strips the `ROUTE_TO` block from the LLM message and returns `reply` (text) plus `route_to` (JSON) for the frontend.
+- **Rate Limits**: `/api/ai/*` endpoints limited to 20 req/min/user to protect LLM costs.
+
+### RAG Flow
+1) User message arrives at `/api/ai/chat` with prior turns.
+2) GroqChatService detects intent and calls the LLM with a system prompt that demands a `ROUTE_TO` JSON when confident.
+3) If needed, embeddings for providers are fetched and ranked (semantic search over `provider_embeddings`).
+4) LLM response is cleaned: text reply + parsed `route_to` JSON.
+5) Frontend renders the reply and, when `route_to` exists, deep-links to the matching services page.
+6) On Groq failure, Anthropic fallback runs; if both fail, a guided fallback message is returned.
+
+### Frontend ↔ Backend Integration
+- **API client**: [frontend/src/api/client.js](frontend/src/api/client.js) proxies `/api` to the backend (`vite.config.js`), adding JWTs automatically.
+- **Chat surfaces**: Floating widget [frontend/src/components/ChatBot.jsx](frontend/src/components/ChatBot.jsx) and hero chat [frontend/src/components/HomeChat.jsx](frontend/src/components/HomeChat.jsx).
+- **Routing UX**: When `route_to` contains `{ service, message, urgency }`, the React components show a CTA button that navigates to the category (e.g., `/services?category=plumbing`).
+- **Multilingual**: `language` param sent with each chat request; LLM answers in Nepali or English.
+
+### Backend Components
+- **Endpoints**: `/api/ai/chat`, `/api/ai/match-providers`, `/api/ai/estimate-price`, `/api/ai/extract-booking`, `/api/ai/analyze-image`, `/api/ai/summarize-reviews`, `/api/ai/trust-score` (all in [backend/app/routes/ai.py](backend/app/routes/ai.py)).
+- **LLM Client**: [backend/app/utils/groq_chat.py](backend/app/utils/groq_chat.py) (Groq) with automatic model deprecation remap to `llama-3.3-70b-versatile`; [backend/app/utils/ai_service.py](backend/app/utils/ai_service.py) handles Anthropic fallback and shared utilities.
+- **Matching**: [backend/app/utils/matching.py](backend/app/utils/matching.py) mixes vector similarity, scoring heuristics, and Women First bonus.
+- **Data Plane**: PostgreSQL stores structured data plus embeddings; uploads served via `/uploads/*` proxied from Vite.
+
+### Key Concepts (cheat sheet)
+- **LLM (Large Language Model)**: Generates natural language responses and the `ROUTE_TO` hints.
+- **RAG**: Pulls real provider/booking facts before the LLM replies to stay accurate and local.
+- **Vector Database**: Stores embeddings so we can do semantic similarity instead of keyword search.
+- **Semantic Search**: Finds “pipe leaking” ≈ “tap dripping” providers via cosine similarity on embeddings.
+- **Response Parsing**: We split the LLM’s free-form text from its structured JSON so the UI can act on routes without showing the JSON.
+---
+
 ## 🛠️ Tech Stack
 
 ### Backend
@@ -181,7 +219,7 @@ GOOGLE_MAPS_API_KEY=your-api-key
 DATABASE_URL=postgresql://postgres:sewasathi123@postgres:5432/sewasathi
 POSTGRES_PASSWORD=sewasathi123
 FLASK_ENV=development
-VITE_API_URL=http://localhost:5000
+VITE_API_URL=http://localhost:5002
 ```
 
 3. **Start Services**
@@ -190,7 +228,7 @@ docker-compose up -d
 ```
 
 Services start:
-- **Backend**: http://localhost:5000
+- **Backend**: http://localhost:5002
 - **Frontend**: http://localhost:3000
 - **Database**: localhost:5432
 
@@ -402,7 +440,7 @@ After seeding:
 ```bash
 # Production setup
 export FLASK_ENV=production
-flask run --host=0.0.0.0 --port=5000
+flask run --host=0.0.0.0 --port=5002
 ```
 
 ### Docker (Recommended)

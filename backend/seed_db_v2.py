@@ -68,8 +68,8 @@ MALE_SKILLS = [
 ]
 
 def get_avatar_url(name, is_female=False):
-    """Generate avatar URL from UI Avatars API"""
-    bg = 'C084FC' if is_female else '6366F1'
+    """Generate avatar URL from UI Avatars API with brand palette (no purple)."""
+    bg = 'C0392B' if is_female else 'A05A2C'  # brand primary / warm brown
     color = 'ffffff'
     name_encoded = name.replace(' ', '+')
     return f"https://ui-avatars.com/api/?name={name_encoded}&background={bg}&color={color}&size=200"
