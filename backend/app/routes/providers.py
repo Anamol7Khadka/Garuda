@@ -186,7 +186,6 @@ def verify_provider(provider_id):
 
 
 @bp.route('/nearby', methods=['GET'])
-@jwt_required(optional=True)
 def get_nearby_providers():
     try:
         lat = request.args.get('lat', 27.7172, type=float)
@@ -205,6 +204,8 @@ def get_nearby_providers():
         ).filter(
             User.role == 'provider',
             Provider.is_available == True,
+            User.latitude != None,
+            User.longitude != None,
             User.latitude.between(lat - lat_delta, lat + lat_delta),
             User.longitude.between(lng - lng_delta, lng + lng_delta)
         )

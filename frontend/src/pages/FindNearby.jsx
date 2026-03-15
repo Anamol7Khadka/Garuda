@@ -114,6 +114,10 @@ export default function FindNearby() {
             <RouteMap
               providers={providers}
               onProviderSelect={setSelectedProvider}
+              onLocationChange={(loc) => {
+                setUserLocation(loc)
+                fetchNearby(loc)
+              }}
             />
           </div>
 
