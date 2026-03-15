@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import RouteMap from '../components/RouteMap'
 import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function FindNearby() {
   const { isAuthenticated } = useAuth()
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const [providers, setProviders] = useState([])
   const [selectedProvider, setSelectedProvider] = useState(null)
@@ -13,6 +15,8 @@ export default function FindNearby() {
   const [radius, setRadius] = useState(5)
   const [femaleOnly, setFemaleOnly] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [providerMode, setProviderMode] = useState(null)
+  const [customerLocation, setCustomerLocation] = useState(null)
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -20,6 +24,19 @@ export default function FindNearby() {
       navigate('/login?redirectTo=/find-nearby')
     }
   }, [isAuthenticated, navigate])
+
+  // Handle URL parameters for provider mode
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const mode = urlParams.get('mode')
+    const customerLat = parseFloat(urlParams.get('customer_lat'))
+    const customerLng = parseFloat(urlParams.get('customer_lng'))
+
+    if (mode === 'provider' && customerLat && customerLng) {
+      setProviderMode(true)
+      setCustomerLocation({ lat: customerLat, lng: customerLng })
+    }
+  }, [])
 
   useEffect(() => {
     navigator.geolocation?.getCurrentPosition(
@@ -70,10 +87,10 @@ export default function FindNearby() {
                         justify-between flex-wrap gap-3">
           <div>
             <h1 className="text-xl font-bold text-gray-900">
-              🗺️ Providers Near You
+              🗺️ {t('findNearbyTitle')}
             </h1>
             <p className="text-sm text-gray-500">
-              Click any provider to see the route
+              {t('clickToRoute')}
             </p>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
@@ -99,7 +116,7 @@ export default function FindNearby() {
                   : 'bg-white border border-purple-200 text-purple-700'
               }`}
             >
-              💜 Women First {femaleOnly ? 'ON' : 'OFF'}
+              💜 {t('showWomenFirst')}
             </button>
           </div>
         </div>
@@ -129,7 +146,13 @@ export default function FindNearby() {
             {providers.map((provider) => (
               <div
                 key={provider.id}
-                onClick={() => setSelectedProvider(provider)}
+                onClick={() => {
+                  setSelectedProvider(provider)
+                  // Dispatch event to trigger route drawing
+                  window.dispatchEvent(new CustomEvent('routeToProvider', {
+                    detail: String(provider.id)
+                  }))
+                }}
                 className={`bg-white rounded-xl p-4 shadow-sm cursor-pointer 
                            border-2 transition-all hover:shadow-md ${
                   selectedProvider?.id === provider.id
@@ -172,7 +195,7 @@ export default function FindNearby() {
                     className="flex-1 bg-purple-600 text-white text-xs 
                                font-semibold py-2 rounded-lg hover:bg-purple-700 transition"
                   >
-                    Book Now
+                    {t('bookNow')}
                   </button>
                   <button
                     onClick={(e) => {
@@ -183,7 +206,7 @@ export default function FindNearby() {
                                text-xs font-semibold py-2 rounded-lg 
                                hover:bg-gray-50 transition"
                   >
-                    View Profile
+                    {t('viewProfile')}
                   </button>
                 </div>
               </div>
@@ -192,8 +215,8 @@ export default function FindNearby() {
             {!loading && providers.length === 0 && (
               <div className="text-center py-12 text-gray-500">
                 <div className="text-4xl mb-3">🔍</div>
-                <p className="text-sm">No providers found nearby</p>
-                <p className="text-xs mt-1">Try increasing the search radius</p>
+                <p className="text-sm">{t('noProvidersNearby')}</p>
+                <p className="text-xs mt-1">{t('tryIncreasing')}</p>
               </div>
             )}
           </div>

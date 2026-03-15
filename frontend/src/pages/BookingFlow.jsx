@@ -1,33 +1,98 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function BookingFlow() {
+  const { t } = useLanguage()
+  const [searchParams] = useSearchParams()
+  const providerId = searchParams.get('provider_id')
+  const [bookingData, setBookingData] = useState({
+    address: '',
+    description: '',
+    scheduledDate: '',
+    scheduledTime: ''
+  })
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 text-center">बुकिङ फ्लो</h1>
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <p className="text-gray-600 text-center mb-6">यो पृष्ठ अभी निर्माणाधीन छ।</p>
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-4xl font-bold mb-8 text-center">{t('bookNow')}</h1>
+        
+        <div className="bg-white rounded-2xl shadow-md p-8">
           <div className="space-y-6">
-            <div className="border-l-4 border-primary-700 pl-4">
-              <h3 className="font-bold mb-2">चरण 1: समस्या वर्णन गर्नुहोस्</h3>
-              <p className="text-gray-600">पाठ वा फोटो अपलोड गरि आपको समस्या प्रदर्शित गर्नुहोस्</p>
+            
+            {/* Step 1: Your Address */}
+            <div className="space-y-4">
+              <label className="block text-sm font-medium text-gray-700">
+                {t('yourAddress')}
+              </label>
+              <input
+                type="text"
+                value={bookingData.address || ''}
+                onChange={(e) => setBookingData({...bookingData, address: e.target.value})}
+                placeholder="Enter your full address in Kathmandu..."
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 
+                           text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+              <p className="text-xs text-gray-500">
+                💡 Need to find a provider near you? 
+                <a href="/find-nearby" className="text-purple-600 font-medium ml-1">
+                  Use Find Nearby Map →
+                </a>
+              </p>
             </div>
-            <div className="border-l-4 border-primary-700 pl-4">
-              <h3 className="font-bold mb-2">चरण 2: मूल्य अनुमान</h3>
-              <p className="text-gray-600">AI द्वारा मूल्य अनुमान देखुन्नुहोस्</p>
+
+            {/* Step 2: Describe Issue */}
+            <div className="space-y-4">
+              <label className="block text-sm font-medium text-gray-700">
+                {t('describeIssue')}
+              </label>
+              <textarea
+                value={bookingData.description || ''}
+                onChange={(e) => setBookingData({...bookingData, description: e.target.value})}
+                placeholder="Tell us what service you need..."
+                rows="4"
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 
+                           text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
             </div>
-            <div className="border-l-4 border-primary-700 pl-4">
-              <h3 className="font-bold mb-2">चरण 3: तारिख र समय चयन</h3>
-              <p className="text-gray-600">आपको सुविधाजनक समय चयन गर्नुहोस्</p>
+
+            {/* Step 3: Date & Time */}
+            {/* Step 3: Date & Time */}
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  {t('selectDate')}
+                </label>
+                <input
+                  type="date"
+                  value={bookingData.scheduledDate || ''}
+                  onChange={(e) => setBookingData({...bookingData, scheduledDate: e.target.value})}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 
+                             text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+              <div className="space-y-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  {t('selectDate')}
+                </label>
+                <input
+                  type="time"
+                  value={bookingData.scheduledTime || ''}
+                  onChange={(e) => setBookingData({...bookingData, scheduledTime: e.target.value})}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 
+                             text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
             </div>
-            <div className="border-l-4 border-primary-700 pl-4">
-              <h3 className="font-bold mb-2">चरण 4: प्रदान गर्नेहरू मिलाउन</h3>
-              <p className="text-gray-600">AI सुझाईसहित शीर्ष प्रदान गर्नेहरू देखुन्नुहोस्</p>
-            </div>
-            <div className="border-l-4 border-primary-700 pl-4">
-              <h3 className="font-bold mb-2">चरण 5: कन्फर्मेशन र भुक्तानी</h3>
-              <p className="text-gray-600">बुकिङ कन्फर्म गरि भुक्तानी पूरा गर्नुहोस्</p>
-            </div>
+
+            {/* CTA Button */}
+            <button
+              className="w-full mt-8 bg-purple-600 text-white font-semibold py-3 rounded-xl 
+                         hover:bg-purple-700 transition-colors"
+            >
+              {t('confirmBooking')}
+            </button>
           </div>
         </div>
       </div>

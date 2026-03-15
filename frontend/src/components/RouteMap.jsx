@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function RouteMap({ providers = [], onProviderSelect, onLocationChange }) {
+  const { t } = useLanguage()
   const mapContainer = useRef(null)
   const mapRef = useRef(null)
   const customerMarkerRef = useRef(null)
@@ -58,7 +60,7 @@ export default function RouteMap({ providers = [], onProviderSelect, onLocationC
       const customerMarker = new maplibregl.Marker({ element: customerEl })
         .setLngLat([customerLocation.lng, customerLocation.lat])
         .setPopup(new maplibregl.Popup().setHTML(
-          '<div style="font-family:Inter,sans-serif;padding:4px"><strong>📍 Your Location</strong></div>'
+          `<div style="font-family:Inter,sans-serif;padding:4px"><strong>📍 ${t('yourLocation')}</strong></div>`
         ))
         .addTo(map)
       customerMarkerRef.current = customerMarker
@@ -100,7 +102,7 @@ export default function RouteMap({ providers = [], onProviderSelect, onLocationC
                 style="margin-top:8px;width:100%;padding:6px;background:#7C3AED;
                   color:white;border:none;border-radius:6px;cursor:pointer;
                   font-size:12px;font-weight:600">
-                🗺️ Show Route
+                🗺️ ${t('showRoute')}
               </button>
             </div>
           `))
@@ -117,7 +119,12 @@ export default function RouteMap({ providers = [], onProviderSelect, onLocationC
         type: 'line',
         source: 'route',
         layout: { 'line-join': 'round', 'line-cap': 'round' },
-        paint: { 'line-color': '#7C3AED', 'line-width': 5, 'line-opacity': 0.85 }
+        paint: {
+          'line-color': '#7C3AED',
+          'line-width': 6,
+          'line-opacity': 1,
+          'line-blur': 0
+        }
       })
 
       // Click map to relocate customer pin
@@ -154,15 +161,24 @@ export default function RouteMap({ providers = [], onProviderSelect, onLocationC
   const drawRoute = async (map, from, to) => {
     const toLat = to.latitude
     const toLng = to.longitude
-    if (!toLat || !toLng) return
+    if (!toLat || !toLng) {
+      alert('Provider location not available')
+      return
+    }
+
+    // Show loading on route button
+    setRouteInfo({ loading: true })
 
     try {
-      const url = `https://router.project-osrm.org/route/v1/driving/` +
-        `${from.lng},${from.lat};${toLng},${toLat}?overview=full&geometries=geojson`
-      const res = await fetch(url)
+      // Try OSRM first
+      const url = `https://router.project-osrm.org/route/v1/driving/${from.lng},${from.lat};${toLng},${toLat}?overview=full&geometries=geojson`
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 5000)
+      const res = await fetch(url, { signal: controller.signal })
+      clearTimeout(timeout)
       const data = await res.json()
 
-      if (data.routes?.[0]) {
+      if (data.code === 'Ok' && data.routes?.[0]) {
         const route = data.routes[0]
         map.getSource('route').setData({
           type: 'Feature',
@@ -173,33 +189,49 @@ export default function RouteMap({ providers = [], onProviderSelect, onLocationC
           (b, c) => b.extend(c),
           new maplibregl.LngLatBounds(coords[0], coords[0])
         )
-        map.fitBounds(bounds, { padding: 80 })
+        map.fitBounds(bounds, { padding: 100 })
         setRouteInfo({
           distance: (route.distance / 1000).toFixed(1),
           duration: Math.round(route.duration / 60),
-          provider: to.name
+          provider: to.name,
+          isStraightLine: false
         })
+        return
       }
-    } catch {
-      // Straight line fallback
-      map.getSource('route').setData({
-        type: 'Feature',
-        geometry: { type: 'LineString', coordinates: [[from.lng, from.lat], [toLng, toLat]] }
-      })
-      const R = 6371
-      const dLat = (toLat - from.lat) * Math.PI / 180
-      const dLng = (toLng - from.lng) * Math.PI / 180
-      const a = Math.sin(dLat / 2) ** 2 +
-        Math.cos(from.lat * Math.PI / 180) * Math.cos(toLat * Math.PI / 180) *
-        Math.sin(dLng / 2) ** 2
-      const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-      setRouteInfo({
-        distance: dist.toFixed(1),
-        duration: Math.round(dist * 3),
-        provider: to.name,
-        isStraightLine: true
-      })
+    } catch (err) {
+      console.log('OSRM failed, using straight line:', err.message)
     }
+
+    // ALWAYS fallback to straight line if OSRM fails
+    const coords = [[from.lng, from.lat], [toLng, toLat]]
+    map.getSource('route').setData({
+      type: 'Feature',
+      geometry: { type: 'LineString', coordinates: coords }
+    })
+
+    // Fit map to show both points
+    const bounds = new maplibregl.LngLatBounds(
+      [from.lng, from.lat],
+      [toLng, toLat]
+    )
+    map.fitBounds(bounds, { padding: 100 })
+
+    // Calculate straight-line distance
+    const R = 6371
+    const dLat = (toLat - from.lat) * Math.PI / 180
+    const dLng = (toLng - from.lng) * Math.PI / 180
+    const a = Math.sin(dLat/2)**2 +
+      Math.cos(from.lat*Math.PI/180) *
+      Math.cos(toLat*Math.PI/180) *
+      Math.sin(dLng/2)**2
+    const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+
+    setRouteInfo({
+      distance: dist.toFixed(1),
+      duration: Math.round(dist * 3),
+      provider: to.name,
+      isStraightLine: true
+    })
   }
 
   if (loading) return (
@@ -233,19 +265,19 @@ export default function RouteMap({ providers = [], onProviderSelect, onLocationC
           <div className="flex gap-4 text-center">
             <div>
               <div className="text-2xl font-bold text-purple-700">{routeInfo.distance}</div>
-              <div className="text-xs text-gray-500">km away</div>
+              <div className="text-xs text-gray-500">{t('kmAway')}</div>
             </div>
             <div className="w-px bg-gray-200" />
             <div>
               <div className="text-2xl font-bold text-blue-600">{routeInfo.duration}</div>
-              <div className="text-xs text-gray-500">min drive</div>
+              <div className="text-xs text-gray-500">{t('minDrive')}</div>
             </div>
             <div className="w-px bg-gray-200" />
             <div>
               <div className="text-2xl font-bold text-green-600">
                 ~{Math.round(routeInfo.distance * 12)}
               </div>
-              <div className="text-xs text-gray-500">min walk</div>
+              <div className="text-xs text-gray-500">{t('minWalk')}</div>
             </div>
           </div>
           {routeInfo.isStraightLine && (
@@ -257,10 +289,10 @@ export default function RouteMap({ providers = [], onProviderSelect, onLocationC
       <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm
                       rounded-xl p-3 shadow-md text-xs space-y-1.5 z-10">
         <div className="flex items-center gap-2">
-          <span>📍</span><span className="text-gray-600">Your location</span>
+          <span>📍</span><span className="text-gray-600">{t('yourLocation')}</span>
         </div>
         <div className="flex items-center gap-2">
-          <span>💜</span><span className="text-gray-600">Women First</span>
+          <span>💜</span><span className="text-gray-600">{t('womenFirst')}</span>
         </div>
         <div className="flex items-center gap-2">
           <span>👤</span><span className="text-gray-600">Provider</span>

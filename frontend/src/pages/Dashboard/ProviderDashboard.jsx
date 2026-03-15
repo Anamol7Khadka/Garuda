@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { BarChart3, Users, DollarSign, Award } from 'lucide-react'
 import api from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
+import { useLanguage } from '../../context/LanguageContext'
 
 export default function ProviderDashboard() {
+  const navigate = useNavigate()
   const { user } = useAuth()
+  const { t } = useLanguage()
   const [bookings, setBookings] = useState([])
   const [stats, setStats] = useState({})
   const [loading, setLoading] = useState(false)
@@ -49,6 +53,14 @@ export default function ProviderDashboard() {
       loadDashboardData()
     } catch (error) {
       console.error('Failed to update booking status:', error)
+    }
+  }
+
+  const handleNavigateToCustomer = (booking) => {
+    if (booking.customer_latitude && booking.customer_longitude) {
+      navigate(`/find-nearby?mode=provider&customer_lat=${booking.customer_latitude}&customer_lng=${booking.customer_longitude}`)
+    } else {
+      alert('Customer location not available')
     }
   }
 
@@ -167,6 +179,33 @@ export default function ProviderDashboard() {
                       >
                         अस्वीकार गर्नुहोस्
                       </button>
+                    </div>
+                  )}
+
+                  {(booking.status === 'confirmed' || booking.status === 'in_progress') && (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleNavigateToCustomer(booking)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 flex items-center gap-2"
+                      >
+                        🗺️ Navigate to Customer
+                      </button>
+                      {booking.status === 'confirmed' && (
+                        <button
+                          onClick={() => handleStatusUpdate(booking.id, 'in_progress')}
+                          className="px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700"
+                        >
+                          शुरू गर्नुहोस्
+                        </button>
+                      )}
+                      {booking.status === 'in_progress' && (
+                        <button
+                          onClick={() => handleStatusUpdate(booking.id, 'completed')}
+                          className="px-4 py-2 bg-green-700 text-white rounded-lg font-semibold hover:bg-green-800"
+                        >
+                          पूरा गर्नुहोस्
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
