@@ -36,9 +36,12 @@ def register():
         db.session.add(user)
         db.session.flush()  # Get user ID without committing
         
-        # If provider, create provider profile
+        # If provider, create provider profile with skills
         if user.role == 'provider':
-            provider = Provider(user_id=user.id)
+            provider = Provider(
+                user_id=user.id,
+                skills=data.get('skills', [])
+            )
             db.session.add(provider)
         
         db.session.commit()

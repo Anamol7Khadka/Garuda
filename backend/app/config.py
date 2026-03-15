@@ -19,11 +19,12 @@ class Config:
     ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'pdf'}
     
     # APIs
-    ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+    ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")  # Fallback only
     GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
     
     # AI Settings
-    AI_MODEL = "claude-sonnet-4-20250514"
+    AI_MODEL = "llama-3.2-70b-versatile"  # Groq Llama model
     AI_MAX_TOKENS = 1024
 
 class DevelopmentConfig(Config):

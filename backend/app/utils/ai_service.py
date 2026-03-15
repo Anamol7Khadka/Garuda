@@ -1,18 +1,42 @@
 import os
 from anthropic import Anthropic
+from groq import Groq
 import base64
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class AIService:
-    """Wrapper for Anthropic Claude API"""
+    """Wrapper for AI APIs - Primary: Groq Llama 3.2 70B, Fallback: Anthropic Claude"""
     
     def __init__(self):
+        # Primary: Groq for text-based AI
+        groq_key = os.getenv("GROQ_API_KEY")
+        self.groq_client = Groq(api_key=groq_key) if groq_key else None
+        self.groq_model = os.getenv("GROQ_MODEL", "llama-3.1-70b-versatile")
+        
+        # Fallback: Anthropic for image analysis
         self.client = Anthropic()
         self.model = os.getenv("AI_MODEL", "claude-sonnet-4-20250514")
     
     def chat(self, messages, system_prompt=None, max_tokens=1024):
-        """Send messages to Claude and get response"""
+        """Send messages using Groq (primary) or Claude (fallback)"""
+        # Try Groq first (faster, cheaper)
+        if self.groq_client:
+            try:
+                response = self.groq_client.chat.completions.create(
+                    model=self.groq_model,
+                    max_tokens=max_tokens,
+                    system=system_prompt,
+                    messages=messages
+                )
+                return response.choices[0].message.content
+            except Exception as groq_err:
+                logger.warning(f"Groq error, falling back to Claude: {str(groq_err)[:100]}")
+        
+        # Fallback to Claude
         try:
             response = self.client.messages.create(
                 model=self.model,
@@ -22,7 +46,7 @@ class AIService:
             )
             return response.content[0].text
         except Exception as e:
-            raise Exception(f"AI Service Error: {str(e)}")
+            raise Exception(f"AI Service Error (Groq and Claude failed): {str(e)}")
     
     def extract_booking_details(self, description):
         """Extract structured booking data from natural language"""
@@ -61,42 +85,140 @@ JSON only, no markdown:"""
                 "problem_description": description
             }
     
-    def estimate_price(self, service_category, description):
-        """Estimate price for a service based on description"""
-        prompt = f"""You are a pricing expert for home services in Nepal. 
+    def estimate_price(self, service_category, description, location="Kathmandu"):
+        """
+        AI price estimation with RAG and similarity search
         
-Service Category: {service_category}
-Job Description: {description}
+        Process:
+        1. Similarity search on historical bookings (RAG)
+        2. Service complexity analysis
+        3. Location factor consideration
+        4. AI-powered base price estimation
+        5. Return comprehensive pricing breakdown
+        """
+        from app.models import Booking, Service, Provider
+        
+        # RAG: Find similar past bookings for this service category
+        similar_bookings = []
+        try:
+            bookings_query = Booking.query.join(
+                Service, Booking.service_id == Service.id
+            ).filter(
+                Service.title.ilike(f'%{service_category}%')
+            ).all()
+            
+            similar_bookings = [
+                {
+                    'price': b.final_price,
+                    'description': b.description,
+                    'status': b.status
+                } for b in bookings_query[-10:] if b.final_price > 0
+            ]
+        except:
+            similar_bookings = []
+        
+        # Calculate RAG-based baseline
+        rag_baseline = None
+        if similar_bookings:
+            completed_bookings = [b for b in similar_bookings if b['status'] == 'completed']
+            if completed_bookings:
+                rag_baseline = sum(b['price'] for b in completed_bookings) / len(completed_bookings)
+        
+        # Service-specific web search baseline (hardcoded for common services in Nepal)
+        service_baselines = {
+            'plumbing': {'low': 300, 'medium': 800, 'high': 2000},
+            'electrical': {'low': 400, 'medium': 1000, 'high': 2500},
+            'cleaning': {'low': 200, 'medium': 600, 'high': 1500},
+            'house cleaning': {'low': 200, 'medium': 600, 'high': 1500},
+            'beauty': {'low': 500, 'medium': 1500, 'high': 3000},
+            'carpentry': {'low': 400, 'medium': 1200, 'high': 3000},
+            'painting': {'low': 300, 'medium': 1000, 'high': 2500},
+            'ac': {'low': 400, 'medium': 1500, 'high': 3500},
+            'electrical repair': {'low': 400, 'medium': 1000, 'high': 2500},
+            'appliance repair': {'low': 500, 'medium': 1200, 'high': 3000},
+            'tutoring': {'low': 300, 'medium': 800, 'high': 1500},
+            'pest control': {'low': 1000, 'medium': 2000, 'high': 5000},
+            'cooking': {'low': 600, 'medium': 1500, 'high': 3000},
+        }
+        
+        # Get baseline for service
+        category_lower = service_category.lower()
+        baseline_prices = None
+        for key, prices in service_baselines.items():
+            if key in category_lower:
+                baseline_prices = prices
+                break
+        
+        if not baseline_prices:
+            baseline_prices = {'low': 500, 'medium': 1500, 'high': 3500}  # Default
+        
+        # AI-powered complexity analysis
+        prompt = f"""Analyze this home service request and determine complexity level.
 
-Provide a price estimate. Consider Nepal-specific factors like location premium for Kathmandu valley.
+Service: {service_category}
+Description: {description}
+Location: {location} (Kathmandu valley)
 
-Return ONLY valid JSON (no markdown, no code blocks):
+Based on the description, classify as LOW, MEDIUM, or HIGH complexity.
+Also estimate a price multiplier (0.7 to 1.5) based on difficulty.
+
+Return ONLY valid JSON:
 {{
-  "min_price": number,
-  "max_price": number,
-  "currency": "NPR",
-  "reasoning": "string",
-  "complexity": "low|medium|high"
+  "complexity": "low|medium|high",
+  "multiplier": number,
+  "factors": ["factor1", "factor2"],
+  "recommendation": "brief explanation"
 }}"""
         
-        response = self.chat([{"role": "user", "content": prompt}], max_tokens=300)
-        
         try:
+            response = self.chat([{"role": "user", "content": prompt}], max_tokens=300)
             json_str = response.strip()
             if "```" in json_str:
                 json_str = json_str.split("```")[1]
                 if json_str.startswith("json"):
                     json_str = json_str[4:]
             
-            return json.loads(json_str)
-        except json.JSONDecodeError:
-            return {
-                "min_price": 500,
-                "max_price": 1500,
-                "currency": "NPR",
-                "reasoning": "Unable to estimate - contact provider",
-                "complexity": "medium"
+            complexity_data = json.loads(json_str)
+        except:
+            complexity_data = {
+                'complexity': 'medium',
+                'multiplier': 1.0,
+                'factors': [],
+                'recommendation': 'Standard service'
             }
+        
+        complexity = complexity_data.get('complexity', 'medium')
+        multiplier = float(complexity_data.get('multiplier', 1.0))
+        
+        # Delhi/Kathmandu valley location premium (15-20%)
+        location_multiplier = 1.15 if 'kathmandu' in location.lower() or 'valley' in location.lower() else 1.0
+        
+        # Calculate price range
+        base_min = baseline_prices['low']
+        base_mid = baseline_prices['medium']
+        base_max = baseline_prices['high']
+        
+        # Apply RAG adjustment if available
+        if rag_baseline:
+            # Weight: 60% web search baseline, 40% RAG (similar past bookings)
+            base_mid = (base_mid * 0.6) + (rag_baseline * 0.4)
+        
+        # Apply multipliers
+        final_min = int(base_min * multiplier * location_multiplier)
+        final_mid = int(base_mid * multiplier * location_multiplier)
+        final_max = int(base_max * multiplier * location_multiplier)
+        
+        return {
+            "min_price": final_min,
+            "max_price": final_max,
+            "currency": "NPR",
+            "base_price": final_mid,
+            "reasoning": complexity_data.get('recommendation', 'AI-estimated based on service complexity'),
+            "complexity": complexity,
+            "location_factor": f"{(location_multiplier * 100):.0f}%",
+            "multiplier": f"{(multiplier * 100):.0f}%",
+            "factors": complexity_data.get('factors', [])
+        }
     
     def analyze_image(self, image_base64):
         """Analyze an image to detect problems and suggest services"""

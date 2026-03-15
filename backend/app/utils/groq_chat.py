@@ -25,8 +25,8 @@ class GroqChatService:
         if not api_key:
             raise ValueError("GROQ_API_KEY not set")
         self.client = Groq(api_key=api_key)
-        # FIXED: updated to current working model
-        self.model = os.getenv('GROQ_MODEL', 'llama-3.3-70b-versatile')
+        # Using Groq Llama 3.1 70B versatile model
+        self.model = os.getenv('GROQ_MODEL', 'llama-3.1-70b-versatile')
         logger.info(f'Groq initialized with model: {self.model}')
 
     def detect_service_intent(self, text):

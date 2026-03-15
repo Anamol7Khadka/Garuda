@@ -39,7 +39,7 @@ def create_app(config_name="development"):
     )
     
     # Register blueprints
-    from app.routes import auth, services, providers, bookings, reviews, ai
+    from app.routes import auth, services, providers, bookings, reviews, ai, rag
     
     app.register_blueprint(auth.bp)
     app.register_blueprint(services.bp)
@@ -47,6 +47,7 @@ def create_app(config_name="development"):
     app.register_blueprint(bookings.bp)
     app.register_blueprint(reviews.bp)
     app.register_blueprint(ai.bp)
+    app.register_blueprint(rag.bp)
     
     # Static file serving for uploads
     import os
