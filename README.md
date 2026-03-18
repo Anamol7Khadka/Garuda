@@ -1,131 +1,127 @@
-# SewaSathi - सेवासाथी
-## "मान्छे सेवामा सेवासाथी" - AI-Powered Home Services Marketplace for Nepal
+# Garuda 
+## AI-Powered Home Services Marketplace for Nepal
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-1.0.0-brightgreen.svg)
+![Version](https://img.shields.io/badge/version-1.1.0-brightgreen.svg)
 ![Status](https://img.shields.io/badge/status-hackathon%20ready-orange.svg)
 
-**SewaSathi** is a full-stack AI-powered home services marketplace platform built specifically for Nepal, prioritizing women service providers through an innovative "Women First" system.
+Garuda is a full-stack AI-powered home services marketplace built for Nepal, prioritizing women service providers through a Women First system. Tested and built on macOS. Recent updates include a Dynamic Cost Calculator, AI-enhanced price estimation with RAG, and a refreshed UI theme (new palette, typography, and subtle animations).
 
 ---
 
-## 🌟 Features
+## Problems We Address
+- Cluttered and informal market: homeowners struggle to find reliable workers and rely on word-of-mouth or random contacts.
+- Uncertain prices and unpredictable service quality: no transparent estimates or guarantees.
+- Broken connection: demand and skills exist, but matching is inefficient; workers wait at chowks/roadside and often depend on middlemen who take commission
+
+Garuda offers a one-stop solution: verified providers, transparent AI-assisted pricing, structured workflows, and a trusted marketplace that connects homeowners and workers directly.
+
+## Revenue Model
+1. Service commission: percentage on completed jobs.
+2. Worker subscription plans: premium visibility, faster payouts, and lead boosts for providers.
+3. Business partnerships: enterprise and institutional contracts for facilities, housing, and campus maintenance.
+4. Data insights: anonymized operational insights for government and agencies where permitted.
+
+## Scaling Strategy
+1. Geographic scaling: start in Nepal, expand to South Asia and beyond.
+2. Vertical scaling: evolve from recommendations to handling payments, insurance, and end-to-end service guarantees.
+3. Institutional scaling: extend from B2C to B2B and toward a SaaS offering for partners.
+
+## Features
+
+### Recent Updates (Mar 2026)
+- Dynamic Cost Calculator in the booking flow with travel and multiplier breakdown ([frontend/src/components/DynamicCostCalculator.jsx](frontend/src/components/DynamicCostCalculator.jsx), [frontend/src/pages/BookingFlow.jsx](frontend/src/pages/BookingFlow.jsx)).
+- AI price estimator now uses RAG and similarity search for Nepal-specific pricing ([backend/app/utils/ai_service.py](backend/app/utils/ai_service.py)).
+- Floating chat widget removed; hero chat remains on the home page ([frontend/src/components/HomeChat.jsx](frontend/src/components/HomeChat.jsx)).
+- New color palette, typography, and subtle animations applied across UI ([frontend/tailwind.config.js](frontend/tailwind.config.js), [frontend/src/index.css](frontend/src/index.css)).
 
 ### Core Platform
-- ✅ **User Roles**: Customer, Service Provider, Admin
-- ✅ **JWT-based Authentication**: Secure, token-based access
-- ✅ **PostgreSQL Database**: Robust data persistence
-- ✅ **Docker Containerization**: Easy deployment
-- ✅ **Responsive Design**: Mobile-first Tailwind CSS
+- User roles: Customer, Service Provider, Admin.
+- Authentication: JWT-based access control.
+- Database: PostgreSQL.
+- Deployment: Docker and Docker Compose.
+- Frontend: Responsive, mobile-first Tailwind CSS.
 
-### Women First System 💜
-- 👩‍💼 Purple "Women First" badge on all female provider profiles
-- 📌 Filters to show women providers first
-- 📊 Dedicated homepage section for women entrepreneurs
-- 🎯 +10 bonus score in AI matching algorithm for female providers
-- 📈 Women First filter toggle on Services page (prominent)
+### Women First System
+- Women First badge on female provider profiles.
+- Filters prioritize women providers.
+- Dedicated homepage section for women entrepreneurs.
+- +10 bonus score in AI matching algorithm for female providers.
+- Women First filter toggle on the Services page.
 
 ### AI Features (Claude API Integration)
-1. **🤖 AI Booking Chatbot** (`/api/ai/chat`)
-   - Multi-turn conversation in Nepali/English
-   - Context-aware booking assistance
-   - Natural language understanding
-
-2. **🎯 Smart Provider Matching** (`/api/ai/match-providers`)
-   - AI ranks providers 0-100
-   - Considers location, expertise, reviews, gender preference
-   - Returns match reasoning for each provider
-
-3. 💰 **AI Price Estimator** (`/api/ai/estimate-price`)
-   - Analyzes job descriptions
-   - Returns price range with complexity level
-   - Nepal-specific pricing factors
-
-4. 📸 **Image Problem Analyzer** (`/api/ai/analyze-image`)
-   - Upload photo of issue
-   - AI detects problem + suggests service
-   - Auto-fills booking form
-
-5. ⭐ **Review Summarizer** (`/api/ai/summarize-reviews`)
-   - 2-3 sentence AI summaries after 5+ reviews
-   - Highlights strengths and themes
-
-6. 📈 **Trust Score Generator** (`/api/ai/trust-score`)
-   - Calculates provider credibility 0-100
-   - Assigns badges: New/Rising/Trusted/Expert
-   - Factors: experience, ID verification, completion rate
+1. AI Booking Chatbot (`/api/ai/chat`): Multi-turn Nepali/English conversation with booking assistance.
+2. Smart Provider Matching (`/api/ai/match-providers`): Ranks providers and returns match reasoning with gender preference support.
+3. AI Price Estimator with RAG (`/api/ai/estimate-price`): Similarity search over historical bookings plus Nepal baseline rates; formula: Base × Complexity × Location × Rating × Experience + Travel.
+4. Dynamic Cost Calculator (frontend): Shows cost after location, computes travel (Rs 10/km) with Haversine distance, applies rating/experience/complexity multipliers, animated breakdown in booking flow.
+5. Image Problem Analyzer (`/api/ai/analyze-image`): Detects issue from photo and suggests service, auto-fills booking form.
+6. Review Summarizer (`/api/ai/summarize-reviews`): 2-3 sentence summaries after 5+ reviews.
+7. Trust Score Generator (`/api/ai/trust-score`): Credibility score 0-100 with badge assignment.
 
 ---
 
-## 🤖 AI Architecture (LLM + RAG + Routing)
-
-- **LLM Backbone**: Groq-hosted `llama-3.3-70b-versatile` for fast text generation; Anthropic Claude (`claude-sonnet-4-20250514`) as fallback.
-- **RAG (Retrieval-Augmented Generation)**: We ground LLM replies on provider and booking data to reduce hallucinations and localize answers.
-- **Vector Database**: PostgreSQL table `provider_embeddings` stores dense vectors; similarity search powers semantic recall.
-- **Semantic Search**: User text → embedding → cosine similarity over stored vectors → top-k providers feed the response.
-- **Service Intent Detection**: Lightweight keyword scorer + LLM route extraction (`ROUTE_TO` JSON) to decide which service category to open in the UI.
-- **Response Parsing**: Backend strips the `ROUTE_TO` block from the LLM message and returns `reply` (text) plus `route_to` (JSON) for the frontend.
-- **Rate Limits**: `/api/ai/*` endpoints limited to 20 req/min/user to protect LLM costs.
+## AI Architecture (LLM + RAG + Routing)
+- LLM backbone: Groq-hosted `llama-3.3-70b-versatile`; Anthropic Claude (`claude-sonnet-4-20250514`) fallback.
+- RAG: Provider and booking data retrieval grounds responses.
+- Vector database: PostgreSQL table `provider_embeddings` with cosine similarity search.
+- Service intent detection: Keyword scorer plus LLM-extracted `ROUTE_TO` JSON.
+- Response parsing: Backend returns `reply` text and `route_to` JSON separately.
+- Rate limits: `/api/ai/*` capped at 20 requests per minute per user.
 
 ### RAG Flow
-1) User message arrives at `/api/ai/chat` with prior turns.
-2) GroqChatService detects intent and calls the LLM with a system prompt that demands a `ROUTE_TO` JSON when confident.
-3) If needed, embeddings for providers are fetched and ranked (semantic search over `provider_embeddings`).
-4) LLM response is cleaned: text reply + parsed `route_to` JSON.
-5) Frontend renders the reply and, when `route_to` exists, deep-links to the matching services page.
-6) On Groq failure, Anthropic fallback runs; if both fail, a guided fallback message is returned.
+1. User message arrives at `/api/ai/chat` with prior turns.
+2. GroqChatService detects intent and prompts the LLM for `ROUTE_TO` JSON when confident.
+3. Embeddings are fetched and ranked from `provider_embeddings` when needed.
+4. Response is cleaned into text plus parsed `route_to` JSON.
+5. Frontend renders the reply and deep-links when `route_to` exists.
+6. Anthropic fallback runs if Groq fails; guided fallback shown if both fail.
 
 ### Frontend ↔ Backend Integration
-- **API client**: [frontend/src/api/client.js](frontend/src/api/client.js) proxies `/api` to the backend (`vite.config.js`), adding JWTs automatically.
-- **Chat surfaces**: Floating widget [frontend/src/components/ChatBot.jsx](frontend/src/components/ChatBot.jsx) and hero chat [frontend/src/components/HomeChat.jsx](frontend/src/components/HomeChat.jsx).
-- **Routing UX**: When `route_to` contains `{ service, message, urgency }`, the React components show a CTA button that navigates to the category (e.g., `/services?category=plumbing`).
-- **Multilingual**: `language` param sent with each chat request; LLM answers in Nepali or English.
+- API client: [frontend/src/api/client.js](frontend/src/api/client.js) proxies `/api` to the backend (`vite.config.js`), adding JWTs automatically.
+- Booking cost: [frontend/src/components/DynamicCostCalculator.jsx](frontend/src/components/DynamicCostCalculator.jsx) renders AI-aware pricing breakdown inside the booking flow.
+- Chat surface: Hero chat on the home page ([frontend/src/components/HomeChat.jsx](frontend/src/components/HomeChat.jsx)); floating chat widget removed for a cleaner UI.
+- Routing UX: When `route_to` contains `{ service, message, urgency }`, the React components show a CTA that navigates to the category (for example, `/services?category=plumbing`).
+- Multilingual: `language` param on each chat request; LLM responds in Nepali or English.
 
 ### Backend Components
-- **Endpoints**: `/api/ai/chat`, `/api/ai/match-providers`, `/api/ai/estimate-price`, `/api/ai/extract-booking`, `/api/ai/analyze-image`, `/api/ai/summarize-reviews`, `/api/ai/trust-score` (all in [backend/app/routes/ai.py](backend/app/routes/ai.py)).
-- **LLM Client**: [backend/app/utils/groq_chat.py](backend/app/utils/groq_chat.py) (Groq) with automatic model deprecation remap to `llama-3.3-70b-versatile`; [backend/app/utils/ai_service.py](backend/app/utils/ai_service.py) handles Anthropic fallback and shared utilities.
-- **Matching**: [backend/app/utils/matching.py](backend/app/utils/matching.py) mixes vector similarity, scoring heuristics, and Women First bonus.
-- **Data Plane**: PostgreSQL stores structured data plus embeddings; uploads served via `/uploads/*` proxied from Vite.
+- Endpoints: `/api/ai/chat`, `/api/ai/match-providers`, `/api/ai/estimate-price`, `/api/ai/extract-booking`, `/api/ai/analyze-image`, `/api/ai/summarize-reviews`, `/api/ai/trust-score` (all in [backend/app/routes/ai.py](backend/app/routes/ai.py)).
+- LLM Client: [backend/app/utils/groq_chat.py](backend/app/utils/groq_chat.py); [backend/app/utils/ai_service.py](backend/app/utils/ai_service.py) manages Anthropic fallback, shared utilities, and RAG/similarity-based price estimation.
+- Matching: [backend/app/utils/matching.py](backend/app/utils/matching.py) combines vector similarity, scoring heuristics, and Women First bonus.
+- Data Plane: PostgreSQL stores structured data plus embeddings; uploads served via `/uploads/*` proxied from Vite.
 
-### Key Concepts (cheat sheet)
-- **LLM (Large Language Model)**: Generates natural language responses and the `ROUTE_TO` hints.
-- **RAG**: Pulls real provider/booking facts before the LLM replies to stay accurate and local.
-- **Vector Database**: Stores embeddings so we can do semantic similarity instead of keyword search.
-- **Semantic Search**: Finds “pipe leaking” ≈ “tap dripping” providers via cosine similarity on embeddings.
-- **Response Parsing**: We split the LLM’s free-form text from its structured JSON so the UI can act on routes without showing the JSON.
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Backend
-- **Framework**: Flask 2.3.5
-- **Database**: PostgreSQL 15 + SQLAlchemy ORM
-- **Authentication**: Flask-JWT-Extended
-- **AI**: Anthropic Claude API (claude-sonnet-4-20250514)
-- **Validation**: Marshmallow
-- **Migration**: Flask-Migrate
-- **Server**: Gunicorn
+- Framework: Flask 2.3.5.
+- Database: PostgreSQL 15 with SQLAlchemy ORM.
+- Authentication: Flask-JWT-Extended.
+- AI: Anthropic Claude API (claude-sonnet-4-20250514).
+- Validation: Marshmallow.
+- Migration: Flask-Migrate.
+- Server: Gunicorn.
 
 ### Frontend
-- **Framework**: React 18.2 + Vite 5
-- **Styling**: Tailwind CSS 3 + Custom theme
-- **Routing**: React Router v6
-- **HTTP**: Axios
-- **Icons**: Lucide React
-- **Font**: Noto Sans Devanagari (Nepali support)
+- Framework: React 18.2 with Vite 5.
+- Styling: Tailwind CSS 3 with custom theme.
+- Routing: React Router v6.
+- HTTP: Axios.
+- Icons: Lucide React.
+- Fonts: Sora (headings) and Inter (body), Nepali supported via system fallbacks.
 
 ### DevOps
-- **Containerization**: Docker + Docker Compose
-- **Volume Persistence**: PostgreSQL data + uploads
-- **Network**: Bridge networking
-- **Health Checks**: Built-in
+- Containerization: Docker and Docker Compose.
+- Volume persistence: PostgreSQL data and uploads.
+- Network: Bridge networking.
+- Health checks: Built-in.
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
-sewasathi/
+garuda/
 ├── docker-compose.yml          # Service orchestration
 ├── .env.example                # Environment template
 ├── README.md                   # This file
@@ -134,25 +130,25 @@ sewasathi/
 │   ├── Dockerfile
 │   ├── requirements.txt
 │   ├── run.py                  # Entry point
-│   ├── seed_db.py             # Sample data generator
+│   ├── seed_db.py              # Sample data generator
 │   └── app/
-│       ├── __init__.py        # App factory
-│       ├── config.py          # Configuration
+│       ├── __init__.py         # App factory
+│       ├── config.py           # Configuration
 │       ├── models/
-│       │   ├── user.py        # User + Provider models
-│       │   ├── service.py     # Service + Category models
-│       │   ├── booking.py     # Booking model
-│       │   └── review.py      # Review model
+│       │   ├── user.py         # User + Provider models
+│       │   ├── service.py      # Service + Category models
+│       │   ├── booking.py      # Booking model
+│       │   └── review.py       # Review model
 │       ├── routes/
-│       │   ├── auth.py        # Auth endpoints
-│       │   ├── providers.py   # Provider endpoints
-│       │   ├── services.py    # Service endpoints
-│       │   ├── bookings.py    # Booking endpoints
-│       │   ├── reviews.py     # Review endpoints
-│       │   └── ai.py          # AI endpoints (6 endpoints)
+│       │   ├── auth.py         # Auth endpoints
+│       │   ├── providers.py    # Provider endpoints
+│       │   ├── services.py     # Service endpoints
+│       │   ├── bookings.py     # Booking endpoints
+│       │   ├── reviews.py      # Review endpoints
+│       │   └── ai.py           # AI endpoints
 │       └── utils/
-│           ├── ai_service.py  # Claude API wrapper
-│           └── matching.py    # Provider matching logic
+│           ├── ai_service.py   # Claude and RAG utilities
+│           └── matching.py     # Provider matching logic
 │
 └── frontend/
     ├── Dockerfile
@@ -164,23 +160,24 @@ sewasathi/
     └── src/
         ├── main.jsx
         ├── App.jsx
-        ├── index.css           # Tailwind + custom styles
+        ├── index.css
         ├── api/
-        │   └── client.js       # Axios config + interceptors
+        │   └── client.js
         ├── context/
         │   ├── AuthContext.jsx
         │   └── BookingContext.jsx
         ├── components/
         │   ├── Navbar.jsx
-        │   ├── ChatBot.jsx     # Floating chatbot
+        │   ├── HomeChat.jsx            # Hero chatbot on home
+        │   ├── DynamicCostCalculator.jsx
         │   ├── ProviderCard.jsx
         │   ├── ServiceCard.jsx
         │   └── Loading.jsx
         └── pages/
-            ├── Home.jsx        # Landing page
+            ├── Home.jsx
             ├── Login.jsx
             ├── Register.jsx
-            ├── Services.jsx    # Provider list + filters
+            ├── Services.jsx
             ├── ProviderProfile.jsx
             ├── BookingFlow.jsx
             ├── AdminDashboard.jsx
@@ -191,27 +188,42 @@ sewasathi/
 
 ---
 
-## 🚀 Quick Start
+## Setup and Running (macOS)
+- Confirm Docker and Docker Compose are installed on macOS.
+- All required keys and defaults are provided in [.env.example](.env.example). Copy it to `.env` and adjust as needed.
 
-### Prerequisites
-- Docker & Docker Compose
-- Git
-- API Keys: Anthropic, Google Maps (optional for MVP)
-
-### Setup
-
-1. **Clone Repository**
+### Steps
+1. Clone and enter the repository
 ```bash
-git clone https://github.com/yourusername/sewasathi.git
-cd sewasathi
+git clone https://github.com/yourusername/garuda.git
+cd garuda
 ```
-
-2. **Configure Environment**
+2. Create `.env` from the example (contains all keys and ports)
 ```bash
 cp .env.example .env
-# Edit .env with your API keys
+# Update values if needed (Anthropic, Google Maps, JWT, database, BACKEND_PORT, VITE_API_URL)
+```
+3. Start services (Docker Compose)
+```bash
+docker-compose up -d
+```
+Services:
+- Backend: http://localhost:5002 (configurable via BACKEND_PORT)
+- Frontend: http://localhost:3000
+- Database: localhost:5432
+
+4. Seed sample data
+```bash
+docker-compose exec backend python seed_db.py
 ```
 
+5. Develop
+- Backend reloads via the mounted volume.
+- Frontend uses Vite hot reload.
+
+---
+
+## Environment Variables (.env example contains all keys)
 ```env
 ANTHROPIC_API_KEY=sk-ant-xxxxxx
 JWT_SECRET_KEY=your-super-secret-key
@@ -219,34 +231,13 @@ GOOGLE_MAPS_API_KEY=your-api-key
 DATABASE_URL=postgresql://postgres:sewasathi123@postgres:5432/sewasathi
 POSTGRES_PASSWORD=sewasathi123
 FLASK_ENV=development
+BACKEND_PORT=5002
 VITE_API_URL=http://localhost:5002
 ```
 
-3. **Start Services**
-```bash
-docker-compose up -d
-```
-
-Services start:
-- **Backend**: http://localhost:5002
-- **Frontend**: http://localhost:3000
-- **Database**: localhost:5432
-
-4. **Seed Sample Data**
-```bash
-docker-compose exec backend python seed_db.py
-```
-
-This creates:
-- 10 service categories (6 women providers)
-- 10 sample providers (6 female)
-- 4 customers
-- 15 bookings
-- Sample reviews
-
 ---
 
-## 🔑 API Endpoints
+## API Endpoints
 
 ### Authentication
 | Method | Endpoint | Authentication | Purpose |
@@ -260,7 +251,7 @@ This creates:
 | Method | Endpoint | Auth | Purpose |
 |--------|----------|------|---------|
 | GET | `/api/providers` | None | List providers (filter: city, min_rating, women_first) |
-| GET | `/api/providers/:id` | None | Get provider profile + services + reviews |
+| GET | `/api/providers/:id` | None | Get provider profile and reviews |
 | PUT | `/api/providers/:id` | JWT | Update provider profile |
 | POST | `/api/providers/:id/verify` | Admin | Verify provider identity |
 | GET | `/api/providers/my-profile` | JWT | Get current provider profile |
@@ -268,7 +259,7 @@ This creates:
 ### Services
 | Method | Endpoint | Auth | Purpose |
 |--------|----------|------|---------|
-| GET | `/api/services/categories` | None | Get all service categories |
+| GET | `/api/services/categories` | None | List categories |
 | GET | `/api/services` | None | List services (filterable) |
 | POST | `/api/services` | JWT | Create service (provider) |
 | PUT | `/api/services/:id` | JWT | Update service |
@@ -279,7 +270,7 @@ This creates:
 |--------|----------|------|---------|
 | POST | `/api/bookings` | JWT | Create booking |
 | GET | `/api/bookings/my` | JWT | Get customer bookings |
-| GET | `/api/bookings/assigned` | JWT | Get provider's assigned bookings |
+| GET | `/api/bookings/assigned` | JWT | Get provider bookings |
 | GET | `/api/bookings/:id` | JWT | Get booking details |
 | PUT | `/api/bookings/:id/status` | JWT | Update booking status |
 
@@ -290,7 +281,7 @@ This creates:
 | GET | `/api/reviews/provider/:id` | None | Get provider reviews |
 | GET | `/api/reviews/:id` | None | Get review details |
 
-### AI Endpoints (Rate Limited: 20 req/min)
+### AI Endpoints (20 req/min/user)
 | Method | Endpoint | Auth | Purpose |
 |--------|----------|------|---------|
 | POST | `/api/ai/chat` | None | Multi-turn chatbot |
@@ -303,138 +294,59 @@ This creates:
 
 ---
 
-## 🗄️ Database Models
-
-### User
-```python
-id, name, email, password_hash, phone, role (customer/provider/admin),
-gender, profile_photo, lat/lng, city, address, is_verified, is_female, created_at
-```
-
-### Provider (extends User)
-```python
-bio, skills[], years_experience, is_available, rating, total_jobs,
-total_earnings, trust_score, trust_badge, id_verified, certifications[],
-hourly_rate, service_radius_km, review_summary, completion_rate
-```
-
-### ServiceCategory
-```python
-id, name, name_np, icon, description, base_price
-```
-
-### Service
-```python
-id, provider_id, category_id, title, description, price, price_type (fixed/hourly),
-is_active, image_url, created_at
-```
-
-### Booking
-```python
-id, customer_id, provider_id, service_id, status (pending/confirmed/in_progress/completed),
-scheduled_at, address, lat/lng, description, ai_extracted_data (JSON),
-final_price, payment_status, notes, created_at, completed_at
-```
-
-### Review
-```python
-id, booking_id, customer_id, provider_id, rating (1-5), comment,
-ai_summary, sentiment (positive/neutral/negative), images[], created_at
-```
+## Database Models (fields summarized)
+- User: id, name, email, password_hash, phone, role, gender, profile_photo, lat/lng, city, address, is_verified, is_female, created_at.
+- Provider (extends User): bio, skills, years_experience, is_available, rating, total_jobs, total_earnings, trust_score, trust_badge, id_verified, certifications, hourly_rate, service_radius_km, review_summary, completion_rate.
+- ServiceCategory: id, name, name_np, icon, description, base_price.
+- Service: id, provider_id, category_id, title, description, price, price_type, is_active, image_url, created_at.
+- Booking: id, customer_id, provider_id, service_id, status, scheduled_at, address, lat/lng, description, ai_extracted_data, final_price, payment_status, notes, created_at, completed_at.
+- Review: id, booking_id, customer_id, provider_id, rating, comment, ai_summary, sentiment, images, created_at.
 
 ---
 
-## 💜 Women First Feature
+## Women First Feature
 
 ### Design
-- **Color**: Purple (#7C3AED) for all Women First UI elements
-- **Badge**: "Women First 💜" on provider cards and profiles
-- **Filter**: Prominent toggle on Services page
-- **Bonus**: +10 AI match score for female providers
-- **Homepage**: Dedicated section celebrating women entrepreneurs
+- Accent-mid color (#6a6ebd) for Women First UI elements.
+- Women First badge on provider cards and profiles.
+- Prominent toggle on Services page.
+- +10 AI match score for female providers.
+- Dedicated homepage section for women entrepreneurs.
 
 ### Implementation
-- `is_female` boolean on User model
-- +10 bonus in `/api/ai/match-providers` endpoint
-- Filter parameter `women_first=true` on `/api/providers`
-- Sorting by `is_female DESC` in provider listings
+- `is_female` boolean on User model.
+- +10 bonus in `/api/ai/match-providers` endpoint.
+- Filter parameter `women_first=true` on `/api/providers`.
+- Sorting by `is_female DESC` in provider listings.
 
 ---
 
-## 🔐 Security
-
-- ✅ JWT tokens with 24-hour expiration
-- ✅ Password hashing with Werkzeug
-- ✅ CORS enabled for frontend origin
-- ✅ Input validation on all routes (Marshmallow)
-- ✅ File upload validation (jpg/png/pdf, max 5MB)
-- ✅ Rate limiting on AI endpoints (20 req/min)
-- ✅ Admin-only endpoints for sensitive operations
-
----
-
-## 📝 API Response Format
-
-### Success Response
-```json
-{
-  "data": { ... },
-  "message": "Operation successful"
-}
-```
-
-### Error Response
-```json
-{
-  "error": "Error message",
-  "code": "ERROR_CODE"
-}
-```
+## Security
+- JWT tokens with 24-hour expiration.
+- Password hashing with Werkzeug.
+- CORS enabled for frontend origin.
+- Input validation on all routes (Marshmallow).
+- File upload validation (jpg/png/pdf, max 5MB).
+- Rate limiting on AI endpoints (20 req/min).
+- Admin-only endpoints for sensitive operations.
 
 ---
 
-## 🎯 Demo Credentials
-
-After seeding:
-
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | admin@sewasathi.com | admin123 |
-| Provider | provider1@sewasathi.com | provider123 |
-| Customer | customer1@sewasathi.com | customer123 |
-
----
-
-## 📊 Service Categories (Seed Data)
-
-1. Plumbing (प्लम्बिङ) - 🔧
-2. House Cleaning (घर सफाई) - 🧹
-3. Electrical (इलेक्ट्रिकल) - ⚡
-4. Beauty & Wellness (सौन्दर्य) - 💅
-5. Carpentry (काठको काम) - 🪛
-6. Painting (रंगरोगन) - 🎨
-7. AC & Appliances (एसी मर्मत) - ❄️
-8. Tutoring (ट्युसन) - 📚
-9. Pest Control (किरा नियन्त्रण) - 🐛
-10. Cooking (खाना पकाउने) - 👨‍🍳
+## Service Categories (Seed Data)
+1. Plumbing (प्लम्बिङ)
+2. House Cleaning (घर सफाई)
+3. Electrical (इलेक्ट्रिकल)
+4. Beauty and Wellness (सौन्दर्य)
+5. Carpentry (काठको काम)
+6. Painting (रंगरोगन)
+7. AC and Appliances (एसी मर्मत)
+8. Tutoring (ट्युसन)
+9. Pest Control (किरा नियन्त्रण)
+10. Cooking (खाना पकाउने)
 
 ---
 
-## 🎨 Frontend Pages
-
-- **Home** (`/`) - Hero, categories, featured providers, CTA
-- **Services** (`/services`) - Provider listing with filters
-- **Provider Profile** (`/provider/:id`) - Profile, services, reviews
-- **Booking Flow** (`/booking`) - Multi-step booking wizard
-- **Login** (`/login`) - Authentication
-- **Register** (`/register`) - User signup
-- **Customer Dashboard** (`/dashboard/customer`) - Active/past bookings
-- **Provider Dashboard** (`/dashboard/provider`) - Bookings, earnings, reviews
-- **Admin Dashboard** (`/dashboard/admin`) - Platform analytics
-
----
-
-## 🚀 Deployment
+## Deployment
 
 ### Manual
 ```bash
@@ -443,7 +355,7 @@ export FLASK_ENV=production
 flask run --host=0.0.0.0 --port=5002
 ```
 
-### Docker (Recommended)
+### Docker (recommended)
 ```bash
 docker-compose -f docker-compose.yml up --build -d
 ```
@@ -458,96 +370,62 @@ FLASK_ENV=production
 
 ---
 
-## 📚 Nepali Language Support
-
-- UI fully translated to Nepali (नेपाली)
-- Font: Noto Sans Devanagari
-- Chatbot supports Nepali/English
-- City names in Nepali transliteration
-
----
-
-## 🙋‍♀️ Women Entrepreneurship Stats (Post-Seeding)
-
-- 6+ female service providers
-- 100+ women earning opportunities
-- Dedicated "Women First" system
-- Safe, verified marketplace
-- Equal pay for equal work
+## Nepali Language Support
+- UI translated to Nepali (नेपाली).
+- Fonts: Sora (headings) and Inter (body) with Nepali fallbacks.
+- Chatbot supports Nepali and English.
+- City names available in Nepali transliteration.
 
 ---
 
-## 🐛 Known Limitations (MVP)
-
-- Payment integration: Mock (mention eSewa/Khalti for future)
-- Maps: Google Maps optional (for MVP)
-- Image uploads: Local storage (swappable to S3)
-- Notifications: UI ready, backend integration pending
-
----
-
-## 🔄 Development Workflow
-
-1. **Backend Changes**
-   - Edit `backend/app/routes/*.py` or models
-   - Backend auto-reloads (Docker volume mounted)
-
-2. **Frontend Changes**
-   - Edit `frontend/src/**`
-   - Vite hot reload on save
-
-3. **Database Changes**
-   - Seed new data via `seed_db.py`
-   - Or use Flask-Migrate for migrations
+## Known Limitations (MVP)
+- Payment integration is mocked; future eSewa/Khalti planned.
+- Google Maps optional for MVP.
+- Image uploads stored locally (swappable to S3).
+- Notifications UI exists; backend integration pending.
 
 ---
 
-## 📈 Future Enhancements
-
-- [ ] Real payment gateway (eSewa/Khalti)
-- [ ] SMS/Email notifications
-- [ ] Google Maps integration
-- [ ] Video call consultation
-- [ ] Provider timeline & portfolio
-- [ ] Advanced analytics dashboard
-- [ ] Multiple language support
-- [ ] Push notifications
-- [ ] Escrow payment system
-- [ ] Provider verification system
+## Development Workflow
+1. Backend: edit `backend/app/routes/*.py` or models; auto-reloads via Docker volume.
+2. Frontend: edit `frontend/src/**`; Vite hot reload on save.
+3. Database: seed via `seed_db.py` or use Flask-Migrate for migrations.
 
 ---
 
-## 🤝 Contributing
-
-Contributions welcome! For hackathons:
-
-1. Fork the repo
-2. Create feature branch
-3. Commit changes
-4. Push and create PR
-
----
-
-## 📄 License
-
-MIT License - See LICENSE file
+## Future Enhancements
+- Real payment gateway (eSewa/Khalti).
+- SMS/Email notifications.
+- Google Maps integration.
+- Video call consultation.
+- Provider timeline and portfolio.
+- Advanced analytics dashboard.
+- Multiple language support.
+- Push notifications.
+- Escrow payment system.
+- Provider verification system.
 
 ---
 
-## 📞 Support
-
-**For hackathon, demo issues or questions:**
-- Check API endpoints in `backend/app/routes/`
-- Review seed data in `seed_db.py`
-- Test endpoints with provided credentials
-- Check browser console for frontend errors
+## Contributing
+1. Fork the repo.
+2. Create a feature branch.
+3. Commit changes.
+4. Push and create a PR.
 
 ---
 
-## 🎉 Thank You
+## License
+MIT License - See LICENSE file.
 
-Built with ❤️ for Nepal's digital future.
+---
 
-**सेवासाथी - मान्छे सेवामा सेवासाथी**
+## Support
+- Check API endpoints in `backend/app/routes/`.
+- Review seed data in `seed_db.py`.
+- Test endpoints with provided credentials.
+- Check browser console for frontend errors.
 
-Empowering Nepal's service economy, one booking at a time. 💜
+---
+
+Built on macOS to empower Nepal's service economy, one booking at a time.

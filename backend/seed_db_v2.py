@@ -110,6 +110,57 @@ def seed_database():
         db.session.commit()
         print("Created admin user\n")
         
+        # Convenience demo provider (stable login)
+        # Demo provider pinned to Janakpur for tutoring demos
+        janakpur_lat, janakpur_lng = 26.7288, 85.9230
+        demo_user = User(
+            name='Demo Tutor - Janakpur',
+            email='provider1@sewasathi.com',
+            phone='9840000000',
+            role='provider',
+            gender='female',
+            city='Janakpur',
+            is_verified=True,
+            is_female=True,
+            latitude=janakpur_lat,
+            longitude=janakpur_lng,
+            profile_photo=get_avatar_url('Demo Tutor - Janakpur', True)
+        )
+        demo_user.set_password('provider123')
+        db.session.add(demo_user)
+        db.session.flush()
+
+        demo_provider = Provider(
+            user_id=demo_user.id,
+            bio='Demo tutor for quick logins (Janakpur)',
+            skills=['Tutoring'],
+            years_experience=5,
+            is_available=True,
+            rating=4.8,
+            total_jobs=42,
+            id_verified=True,
+            hourly_rate=450,
+            service_radius_km=10,
+            trust_score=90,
+            trust_badge='Trusted',
+            completion_rate=98.5
+        )
+        db.session.add(demo_provider)
+        db.session.flush()
+
+        demo_service = Service(
+            provider_id=demo_provider.id,
+            category_id=categories_map.get('Tutoring', 8),
+            title='Tutoring Service',
+            description='Friendly tutoring support from Janakpur demo provider',
+            price=600,
+            price_type='hourly',
+            is_active=True
+        )
+        db.session.add(demo_service)
+        db.session.commit()
+        print("Created demo provider provider1@sewasathi.com / provider123\n")
+
         providers_created = 0
         services_created = 0
         
